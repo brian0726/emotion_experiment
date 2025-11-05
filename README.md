@@ -78,7 +78,7 @@
 
 ```bash
 # 저장소 클론
-git clone https://github.com/YOUR_USERNAME/emotion_experiment.git
+git clone https://github.com/brian0726/emotion_experiment.git
 cd emotion_experiment
 
 # 가상환경 생성 (선택사항)
