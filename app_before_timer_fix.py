@@ -365,14 +365,14 @@ def experiment_screen():
         st.rerun()
 
     # 5초 후 "빠르게 응답해 주세요" 프롬프트 표시
-    if not st.session_state.show_stimulus and elapsed >= 10 and not st.session_state.show_prompt:
+    if not st.session_state.show_stimulus and elapsed >= 5 and not st.session_state.show_prompt:
         st.session_state.show_prompt = True
 
     if st.session_state.show_prompt:
         st.markdown('<div class="prompt-text">⚡ 빠르게 응답해 주세요</div>', unsafe_allow_html=True)
 
-    # 15초 후 자동 넘어가기 (자극 5초 + 응답 10초)
-    if elapsed >= 15:
+    # 10초 후 자동 넘어가기
+    if elapsed >= 10:
         handle_choice(None, emotion, is_practice)
         return
 
@@ -520,30 +520,6 @@ def main_intro_screen():
         st.rerun()
 
 # 7. 휴식 화면
-
-# 실험 유형 간 30초 휴식 화면
-def rest_between_exp_screen():
-    st.title("휴식 시간")
-    
-    exp_type = st.session_state.experiment_type
-    
-    if exp_type == 2:
-        msg = "첫 번째 실험이 완료되었습니다.\n\n30초간 휴식 후 두 번째 실험이 시작됩니다."
-    else:
-        msg = "두 번째 실험이 완료되었습니다.\n\n30초간 휴식 후 마지막 실험이 시작됩니다."
-    
-    st.markdown(f'<div class="instructions" style="white-space: pre-line;">{msg}</div>', unsafe_allow_html=True)
-    
-    # 타이머
-    timer_placeholder = st.empty()
-    
-    for remaining in range(30, 0, -1):
-        timer_placeholder.markdown(f'<div class="timer" style="font-size: 48px;">{remaining}</div>', unsafe_allow_html=True)
-        time.sleep(1)
-    
-    # 휴식 후 다음 파트 안내로
-    st.session_state.stage = 'next_part'
-    st.rerun()
 def rest_screen():
     st.title("휴식 시간")
 
@@ -563,10 +539,10 @@ def finish_experiment_part():
     exp_type = st.session_state.experiment_type
 
     if exp_type == 1:
-        st.session_state.stage = 'rest_between_exp'
+        st.session_state.stage = 'next_part'
         st.session_state.experiment_type = 2
     elif exp_type == 2:
-        st.session_state.stage = 'rest_between_exp'
+        st.session_state.stage = 'next_part'
         st.session_state.experiment_type = 3
     else:
         st.session_state.stage = 'completion'
@@ -665,8 +641,6 @@ def main():
         practice_repeat_screen()
     elif stage == 'main_intro':
         main_intro_screen()
-    elif stage == 'rest_between_exp':
-        rest_between_exp_screen()
     elif stage == 'rest':
         rest_screen()
     elif stage == 'next_part':
