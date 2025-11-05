@@ -106,7 +106,12 @@ ALL_EMOTIONS = [
 
 # 감정별 미디어 파일 ID/URL 매핑
 # 실제 Google Drive 파일 ID로 교체 필요
-MEDIA_FILES = {emotion: {"image": [], "video": [], "context": []} for emotion in ALL_EMOTIONS}
+# 형식: "감정": {"image": [10개 파일ID], "video": [3개 파일ID], "context": [3개 파일ID]}
+MEDIA_FILES = {emotion: {
+    "image": [f"IMAGE_{emotion}_{i}" for i in range(10)],  # 각 감정당 이미지 10개
+    "video": [f"VIDEO_{emotion}_{i}" for i in range(3)],   # 각 감정당 동영상 3개
+    "context": [f"CONTEXT_{emotion}_{i}" for i in range(3)] # 각 감정당 맥락 3개
+} for emotion in ALL_EMOTIONS}
 
 # Session State 초기화
 def init_session_state():
@@ -150,13 +155,27 @@ def generate_choices(correct_emotion):
     return choices
 
 # Google Drive 미디어 URL 생성
-def get_media_url(emotion, media_type='image', index=0):
+def get_media_url(emotion, media_type='image'):
     """
     media_type: 'image', 'video', 'context'
-    index: 해당 감정의 여러 파일 중 하나를 선택
+    해당 감정의 여러 파일 중 1개를 랜덤으로 선택
+
+    랜덤 방식:
+    - 이미지: 10개 중 1개 랜덤 선택
+    - 동영상: 3개 중 1개 랜덤 선택
+    - 맥락: 3개 중 1개 랜덤 선택
     """
-    # PLACEHOLDER - 실제 파일 ID로 교체 필요
-    file_id = "PLACEHOLDER_ID"
+    if emotion not in MEDIA_FILES:
+        return None
+
+    files = MEDIA_FILES[emotion].get(media_type, [])
+    if not files:
+        return None
+
+    # 랜덤으로 1개 선택
+    file_id = random.choice(files)
+
+    # Google Drive URL 생성
     return f"https://drive.google.com/uc?export=view&id={file_id}"
 
 # 데이터 저장
