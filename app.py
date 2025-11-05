@@ -428,12 +428,8 @@ def handle_choice(selected_emotion, correct_emotion, is_practice):
     else:
         st.session_state.current_trial += 1
 
-        # 중간 휴식 (약 12번째 문항 후)
-        if st.session_state.current_trial == len(st.session_state.trial_order) // 2:
-            st.session_state.stage = 'rest'
-            st.rerun()
         # 모든 문항 완료
-        elif st.session_state.current_trial >= len(st.session_state.trial_order):
+        if st.session_state.current_trial >= len(st.session_state.trial_order):
             finish_experiment_part()
         else:
             # 다음 문항
