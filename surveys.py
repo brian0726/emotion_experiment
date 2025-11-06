@@ -64,6 +64,15 @@ def survey_mfi_screen():
     </div>
     """, unsafe_allow_html=True)
 
+    # CSS를 한 번만 적용
+    st.markdown("""
+    <style>
+    div[data-testid="stForm"] div[role="radiogroup"] label {
+        margin-right: 225px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
     with st.form("mfi_form"):
         responses = {}
 
@@ -72,11 +81,6 @@ def survey_mfi_screen():
             <div class="question-container">
             <strong>{i}. {question}</strong>
             </div>
-            <style>
-            div[data-testid="stHorizontalBlock"] div[role="radiogroup"] label {{
-                margin-right: 225px !important;
-            }}
-            </style>
             """, unsafe_allow_html=True)
 
             responses[f"mfi_q{i}"] = st.radio(
@@ -136,6 +140,15 @@ def survey_phq9_screen():
     </div>
     """, unsafe_allow_html=True)
 
+    # CSS를 한 번만 적용
+    st.markdown("""
+    <style>
+    div[data-testid="stForm"] div[role="radiogroup"] label {
+        margin-right: 325px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
     with st.form("phq9_form"):
         responses = {}
 
@@ -144,11 +157,6 @@ def survey_phq9_screen():
             <div class="question-container">
             <strong>{i}. {question}</strong>
             </div>
-            <style>
-            div[data-testid="stHorizontalBlock"] div[role="radiogroup"] label {{
-                margin-right: 325px !important;
-            }}
-            </style>
             """, unsafe_allow_html=True)
 
             responses[f"phq9_q{i}"] = st.radio(
