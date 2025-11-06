@@ -132,15 +132,16 @@ def survey_phq9_screen():
     </div>
     """, unsafe_allow_html=True)
 
-    scale_options = {
-        0: "전혀 아님",
-        1: "며칠간",
-        2: "일주일 이상",
-        3: "거의 매일"
-    }
-
     with st.form("phq9_form"):
         responses = {}
+
+        # 척도 레이블
+        st.markdown("""
+        <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+        <strong>응답 척도</strong><br>
+        0 = 전혀 아님 | 1 = 2~3일 이상 | 2 = 7일 이상 | 3 = 거의 매일
+        </div>
+        """, unsafe_allow_html=True)
 
         for i, question in enumerate(PHQ9_QUESTIONS, 1):
             st.markdown(f"""
@@ -153,7 +154,7 @@ def survey_phq9_screen():
                 f"문항 {i}",
                 options=[0, 1, 2, 3],
                 index=None,
-                format_func=lambda x: scale_options[x],
+                format_func=lambda x: f"{x}",
                 horizontal=True,
                 key=f"phq9_q{i}",
                 label_visibility="collapsed"
