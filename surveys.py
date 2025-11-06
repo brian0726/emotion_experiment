@@ -91,12 +91,10 @@ def survey_mfi_screen():
 
             # 척도 레이블 (버튼 아래)
             st.markdown("""
-            <div style="display: flex; justify-content: flex-start; gap: 30px; margin-left: 5px; font-size: 11px; color: #666;">
-                <span style="min-width: 80px; text-align: center; white-space: nowrap;">전혀 그렇지 않다</span>
-                <span style="min-width: 80px; text-align: center;"></span>
-                <span style="min-width: 80px; text-align: center; white-space: nowrap;">보통이다</span>
-                <span style="min-width: 80px; text-align: center;"></span>
-                <span style="min-width: 80px; text-align: center; white-space: nowrap;">매우 그렇다</span>
+            <div style="display: flex; justify-content: flex-start; gap: 205px; margin-left: 5px; font-size: 11px; color: #666;">
+                <span style="text-align: center; white-space: nowrap;">전혀 그렇지 않다</span>
+                <span style="text-align: center; white-space: nowrap;">보통이다</span>
+                <span style="text-align: center; white-space: nowrap;">매우 그렇다</span>
             </div>
             """, unsafe_allow_html=True)
 
@@ -165,11 +163,11 @@ def survey_phq9_screen():
 
             # 척도 레이블 (버튼 아래)
             st.markdown("""
-            <div style="display: flex; justify-content: flex-start; gap: 45px; margin-left: 5px; font-size: 11px; color: #666;">
-                <span style="min-width: 60px; text-align: center; white-space: nowrap;">전혀 아님</span>
-                <span style="min-width: 60px; text-align: center; white-space: nowrap;">2~3일 이상</span>
-                <span style="min-width: 60px; text-align: center; white-space: nowrap;">7일 이상</span>
-                <span style="min-width: 60px; text-align: center; white-space: nowrap;">거의 매일</span>
+            <div style="display: flex; justify-content: flex-start; gap: 287px; margin-left: 5px; font-size: 11px; color: #666;">
+                <span style="text-align: center; white-space: nowrap;">전혀 아님</span>
+                <span style="text-align: center; white-space: nowrap;">2~3일 이상</span>
+                <span style="text-align: center; white-space: nowrap;">7일 이상</span>
+                <span style="text-align: center; white-space: nowrap;">거의 매일</span>
             </div>
             """, unsafe_allow_html=True)
 
