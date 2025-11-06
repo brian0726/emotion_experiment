@@ -74,7 +74,7 @@ def survey_mfi_screen():
             </div>
             <style>
             div[data-testid="stHorizontalBlock"] div[role="radiogroup"] label {{
-                margin-right: 45px !important;
+                margin-right: 225px !important;
             }}
             </style>
             """, unsafe_allow_html=True)
@@ -148,7 +148,7 @@ def survey_phq9_screen():
             </div>
             <style>
             div[data-testid="stHorizontalBlock"] div[role="radiogroup"] label {{
-                margin-right: 65px !important;
+                margin-right: 325px !important;
             }}
             </style>
             """, unsafe_allow_html=True)
