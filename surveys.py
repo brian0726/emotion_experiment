@@ -68,6 +68,14 @@ def survey_mfi_screen():
     with st.form("mfi_form"):
         responses = {}
 
+        # 척도 레이블
+        st.markdown("""
+        <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+        <strong>응답 척도</strong><br>
+        1 = 전혀 그렇지 않다 | 3 = 보통이다 | 5 = 매우 그렇다
+        </div>
+        """, unsafe_allow_html=True)
+
         for i, question in enumerate(MFI_QUESTIONS, 1):
             st.markdown(f"""
             <div class="question-container">
@@ -78,6 +86,7 @@ def survey_mfi_screen():
             responses[f"mfi_q{i}"] = st.radio(
                 f"문항 {i}",
                 options=[1, 2, 3, 4, 5],
+                index=None,
                 format_func=lambda x: f"{x}",
                 horizontal=True,
                 key=f"mfi_q{i}",
@@ -89,6 +98,11 @@ def survey_mfi_screen():
         submitted = st.form_submit_button("다음 (우울 설문)")
 
         if submitted:
+            # 미응답 검증
+            if None in responses.values():
+                st.error("모든 문항에 응답해 주세요.")
+                st.stop()
+
             # 설문 데이터 저장
             survey_data = {
                 'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
@@ -138,6 +152,7 @@ def survey_phq9_screen():
             responses[f"phq9_q{i}"] = st.radio(
                 f"문항 {i}",
                 options=[0, 1, 2, 3],
+                index=None,
                 format_func=lambda x: scale_options[x],
                 horizontal=True,
                 key=f"phq9_q{i}",
@@ -149,6 +164,11 @@ def survey_phq9_screen():
         submitted = st.form_submit_button("다음 (성격 설문)")
 
         if submitted:
+            # 미응답 검증
+            if None in responses.values():
+                st.error("모든 문항에 응답해 주세요.")
+                st.stop()
+
             # 총점 계산
             total_score = sum(responses.values())
 
@@ -207,25 +227,28 @@ def survey_tipi_screen():
         for i, question in enumerate(TIPI_QUESTIONS, 1):
             st.markdown(f"""
             <div class="question-container">
-            <strong>{i}. {question}</strong>
+            <strong>{i}. _____ {question}</strong>
             </div>
             """, unsafe_allow_html=True)
 
-            responses[f"tipi_q{i}"] = st.slider(
+            responses[f"tipi_q{i}"] = st.selectbox(
                 f"문항 {i}",
-                min_value=1,
-                max_value=7,
-                value=4,
+                options=[None, 1, 2, 3, 4, 5, 6, 7],
+                format_func=lambda x: "선택하세요" if x is None else f"{x} - {scale_labels[x]}",
                 key=f"tipi_q{i}",
                 label_visibility="collapsed"
             )
 
-            st.caption(f"선택: {scale_labels[responses[f'tipi_q{i}']]}")
             st.markdown("<br>", unsafe_allow_html=True)
 
         submitted = st.form_submit_button("설문 완료 (실험 시작)")
 
         if submitted:
+            # 미응답 검증
+            if None in responses.values():
+                st.error("모든 문항에 응답해 주세요.")
+                st.stop()
+
             # 설문 데이터 저장
             survey_data = {
                 'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
