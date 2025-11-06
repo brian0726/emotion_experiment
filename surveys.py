@@ -226,22 +226,10 @@ def survey_tipi_screen():
         submitted = st.form_submit_button("설문 완료 (실험 시작)")
 
         if submitted:
-            # Big Five 계산
-            extraversion = (responses['tipi_q1'] + (8 - responses['tipi_q6'])) / 2
-            agreeableness = ((8 - responses['tipi_q2']) + responses['tipi_q7']) / 2
-            conscientiousness = (responses['tipi_q3'] + (8 - responses['tipi_q8'])) / 2
-            emotional_stability = ((8 - responses['tipi_q4']) + responses['tipi_q9']) / 2
-            openness = (responses['tipi_q5'] + (8 - responses['tipi_q10'])) / 2
-
             # 설문 데이터 저장
             survey_data = {
                 'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                 'survey_type': 'TIPI',
-                'extraversion': round(extraversion, 2),
-                'agreeableness': round(agreeableness, 2),
-                'conscientiousness': round(conscientiousness, 2),
-                'emotional_stability': round(emotional_stability, 2),
-                'openness': round(openness, 2),
                 **st.session_state.participant_info,
                 **responses
             }
