@@ -5,7 +5,6 @@ import random
 from datetime import datetime
 import os
 import asyncio
-from surveys import survey_mfi_screen, survey_phq9_screen, survey_tipi_screen
 
 # 페이지 설정
 st.set_page_config(
@@ -257,7 +256,7 @@ def participant_info_screen():
                 if student_id == '2023321063':
                     st.session_state.skip_enabled = True
 
-                st.session_state.stage = 'survey_mfi'
+                st.session_state.stage = 'instruction'
                 st.rerun()
 
 # 2. 실험 안내 화면
@@ -645,12 +644,6 @@ def main():
 
     if stage == 'participant_info':
         participant_info_screen()
-    elif stage == 'survey_mfi':
-        survey_mfi_screen()
-    elif stage == 'survey_phq9':
-        survey_phq9_screen()
-    elif stage == 'survey_tipi':
-        survey_tipi_screen()
     elif stage == 'instruction':
         instruction_screen()
     elif stage == 'practice_intro':
