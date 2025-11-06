@@ -72,6 +72,11 @@ def survey_mfi_screen():
             <div class="question-container">
             <strong>{i}. {question}</strong>
             </div>
+            <style>
+            div[data-testid="stHorizontalBlock"] div[role="radiogroup"] label {{
+                margin-right: 45px !important;
+            }}
+            </style>
             """, unsafe_allow_html=True)
 
             responses[f"mfi_q{i}"] = st.radio(
@@ -86,12 +91,12 @@ def survey_mfi_screen():
 
             # 척도 레이블 (버튼 아래)
             st.markdown("""
-            <div style="display: flex; justify-content: flex-start; gap: 30px; margin-left: 5px; font-size: 12px; color: #666;">
-                <span style="width: 50px; text-align: center;">전혀 그렇지 않다</span>
-                <span style="width: 50px; text-align: center;"></span>
-                <span style="width: 50px; text-align: center;">보통이다</span>
-                <span style="width: 50px; text-align: center;"></span>
-                <span style="width: 50px; text-align: center;">매우 그렇다</span>
+            <div style="display: flex; justify-content: flex-start; gap: 63px; margin-left: 5px; font-size: 12px; color: #666;">
+                <span style="width: 20px; text-align: center;">전혀 그렇지 않다</span>
+                <span style="width: 20px; text-align: center;"></span>
+                <span style="width: 20px; text-align: center;">보통이다</span>
+                <span style="width: 20px; text-align: center;"></span>
+                <span style="width: 20px; text-align: center;">매우 그렇다</span>
             </div>
             """, unsafe_allow_html=True)
 
@@ -141,6 +146,11 @@ def survey_phq9_screen():
             <div class="question-container">
             <strong>{i}. {question}</strong>
             </div>
+            <style>
+            div[data-testid="stHorizontalBlock"] div[role="radiogroup"] label {{
+                margin-right: 65px !important;
+            }}
+            </style>
             """, unsafe_allow_html=True)
 
             responses[f"phq9_q{i}"] = st.radio(
@@ -155,11 +165,11 @@ def survey_phq9_screen():
 
             # 척도 레이블 (버튼 아래)
             st.markdown("""
-            <div style="display: flex; justify-content: flex-start; gap: 45px; margin-left: 5px; font-size: 12px; color: #666;">
-                <span style="width: 40px; text-align: center;">전혀 아님</span>
-                <span style="width: 40px; text-align: center;">2~3일 이상</span>
-                <span style="width: 40px; text-align: center;">7일 이상</span>
-                <span style="width: 40px; text-align: center;">거의 매일</span>
+            <div style="display: flex; justify-content: flex-start; gap: 77px; margin-left: 5px; font-size: 12px; color: #666;">
+                <span style="width: 30px; text-align: center;">전혀 아님</span>
+                <span style="width: 30px; text-align: center;">2~3일 이상</span>
+                <span style="width: 30px; text-align: center;">7일 이상</span>
+                <span style="width: 30px; text-align: center;">거의 매일</span>
             </div>
             """, unsafe_allow_html=True)
 
