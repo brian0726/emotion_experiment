@@ -95,7 +95,7 @@ def survey_mfi_screen():
 
             # 척도 레이블 (버튼 아래)
             st.markdown("""
-            <div style="display: flex; justify-content: flex-start; gap: 88px; margin-left: 5px; font-size: 11px; color: #666;">
+            <div style="display: flex; justify-content: flex-start; gap: 110px; margin-left: 5px; font-size: 11px; color: #666;">
                 <span style="text-align: center; white-space: nowrap;">전혀 그렇지 않다</span>
                 <span style="text-align: center; white-space: nowrap;"></span>
                 <span style="text-align: center; white-space: nowrap;">보통이다</span>
@@ -106,7 +106,7 @@ def survey_mfi_screen():
 
             st.markdown("<br>", unsafe_allow_html=True)
 
-        submitted = st.form_submit_button("다음 (우울 설문)")
+        submitted = st.form_submit_button("다음")
 
         if submitted:
             # 미응답 검증
@@ -147,7 +147,7 @@ def survey_phq9_screen():
         st.markdown("""
         <style>
         [data-testid="stForm"] [role="radiogroup"] label {
-            margin-right: 100px !important;
+            margin-right: 120px !important;
         }
         </style>
         """, unsafe_allow_html=True)
@@ -183,7 +183,7 @@ def survey_phq9_screen():
 
             st.markdown("<br>", unsafe_allow_html=True)
 
-        submitted = st.form_submit_button("다음 (성격 설문)")
+        submitted = st.form_submit_button("다음")
 
         if submitted:
             # 미응답 검증
