@@ -68,14 +68,6 @@ def survey_mfi_screen():
     with st.form("mfi_form"):
         responses = {}
 
-        # 척도 레이블
-        st.markdown("""
-        <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-        <strong>응답 척도</strong><br>
-        1 = 전혀 그렇지 않다 | 3 = 보통이다 | 5 = 매우 그렇다
-        </div>
-        """, unsafe_allow_html=True)
-
         for i, question in enumerate(MFI_QUESTIONS, 1):
             st.markdown(f"""
             <div class="question-container">
@@ -92,6 +84,17 @@ def survey_mfi_screen():
                 key=f"mfi_q{i}",
                 label_visibility="collapsed"
             )
+
+            # 척도 레이블 (버튼 아래)
+            st.markdown("""
+            <div style="display: flex; justify-content: flex-start; gap: 30px; margin-left: 5px; font-size: 12px; color: #666;">
+                <span style="width: 50px; text-align: center;">전혀 그렇지 않다</span>
+                <span style="width: 50px; text-align: center;"></span>
+                <span style="width: 50px; text-align: center;">보통이다</span>
+                <span style="width: 50px; text-align: center;"></span>
+                <span style="width: 50px; text-align: center;">매우 그렇다</span>
+            </div>
+            """, unsafe_allow_html=True)
 
             st.markdown("<br>", unsafe_allow_html=True)
 
@@ -135,14 +138,6 @@ def survey_phq9_screen():
     with st.form("phq9_form"):
         responses = {}
 
-        # 척도 레이블
-        st.markdown("""
-        <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-        <strong>응답 척도</strong><br>
-        0 = 전혀 아님 | 1 = 2~3일 이상 | 2 = 7일 이상 | 3 = 거의 매일
-        </div>
-        """, unsafe_allow_html=True)
-
         for i, question in enumerate(PHQ9_QUESTIONS, 1):
             st.markdown(f"""
             <div class="question-container">
@@ -159,6 +154,16 @@ def survey_phq9_screen():
                 key=f"phq9_q{i}",
                 label_visibility="collapsed"
             )
+
+            # 척도 레이블 (버튼 아래)
+            st.markdown("""
+            <div style="display: flex; justify-content: flex-start; gap: 45px; margin-left: 5px; font-size: 12px; color: #666;">
+                <span style="width: 40px; text-align: center;">전혀 아님</span>
+                <span style="width: 40px; text-align: center;">2~3일 이상</span>
+                <span style="width: 40px; text-align: center;">7일 이상</span>
+                <span style="width: 40px; text-align: center;">거의 매일</span>
+            </div>
+            """, unsafe_allow_html=True)
 
             st.markdown("<br>", unsafe_allow_html=True)
 
