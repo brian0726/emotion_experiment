@@ -332,8 +332,15 @@ def experiment_screen():
     elapsed = int(time.time() - st.session_state.trial_start_time) if st.session_state.trial_start_time else 0
     stimulus_elapsed = int(time.time() - st.session_state.stimulus_shown_time) if st.session_state.stimulus_shown_time else 0
 
-    # 타이머 표시
-    st.markdown(f'<div class="timer">{elapsed:02d}초</div>', unsafe_allow_html=True)
+    # 타이머 표시 (카운트다운)
+    if st.session_state.show_stimulus:
+        # 자극 제시 중: 5초에서 카운트다운
+        remaining = max(0, 5 - stimulus_elapsed)
+        st.markdown(f'<div class="timer">남은 시간: {remaining}초</div>', unsafe_allow_html=True)
+    else:
+        # 응답 대기 중: 10초에서 카운트다운 (전체 15초 - 경과 시간)
+        remaining = max(0, 15 - elapsed)
+        st.markdown(f'<div class="timer">남은 시간: {remaining}초</div>', unsafe_allow_html=True)
 
     # 안내문
     instruction_texts = {
