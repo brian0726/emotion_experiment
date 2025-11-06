@@ -61,7 +61,6 @@ def survey_mfi_screen():
     <div class="instructions">
     <strong>Multidimensional Fatigue Inventory (다차원 피로 척도)</strong><br><br>
     현재 상태를 가장 잘 반영하는 정도에 표시하세요.<br>
-    설문 완료 후 우울 설문으로 이동합니다.
     </div>
     """, unsafe_allow_html=True)
 
@@ -131,7 +130,6 @@ def survey_phq9_screen():
     <div class="instructions">
     <strong>Patient Health Questionnaire-9 (환자 건강 질문지)</strong><br><br>
     지난 2주간, 얼마나 자주 다음과 같은 문제들을 겪으셨습니까?<br>
-    설문 완료 후 성격 설문으로 이동합니다.
     </div>
     """, unsafe_allow_html=True)
 
@@ -206,7 +204,6 @@ def survey_tipi_screen():
     다음은 귀하가 평소에 어떤 사람인지에 대한 질문입니다.<br>
     각 문항에 대해 귀하에게 얼마나 해당되는지 응답해 주세요.<br><br>
     <strong>내가 보기에 나 자신은:</strong><br>
-    설문 완료 후 실험이 시작됩니다.
     </div>
     """, unsafe_allow_html=True)
 
