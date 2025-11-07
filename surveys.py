@@ -69,7 +69,7 @@ def survey_mfi_screen():
         st.markdown("""
         <style>
         [data-testid="stForm"] [role="radiogroup"] label {
-            margin-right: 100px !important;
+            margin-right: 120px !important;
         }
         </style>
         """, unsafe_allow_html=True)
