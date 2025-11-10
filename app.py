@@ -6,6 +6,7 @@ from datetime import datetime
 import os
 import asyncio
 from surveys import survey_mfi_screen, survey_phq9_screen, survey_tipi_screen
+from gdrive_utils import get_random_file_from_folder, get_file_embed_url
 
 # 페이지 설정
 st.set_page_config(
@@ -181,13 +182,15 @@ def generate_choices(correct_emotion):
     random.shuffle(choices)
     return choices
 
-# Google Drive 미디어 URL 생성
-def get_media_url(emotion, media_type='image'):
+# Google Drive 미디어 파일 가져오기
+def get_media_file(emotion, media_type='image'):
     """
     media_type: 'image', 'video', 'context'
-    해당 감정의 폴더 ID를 사용하여 URL 생성
+    해당 감정의 폴더에서 랜덤하게 파일 하나를 선택
 
-    폴더 ID를 반환하며, 실제 파일은 폴더 내에서 선택됨
+    Returns:
+        파일 정보 딕셔너리 {"id": "...", "name": "...", "mimeType": "...", "url": "..."}
+        또는 None
     """
     if emotion not in MEDIA_FILES:
         return None
@@ -199,8 +202,21 @@ def get_media_url(emotion, media_type='image'):
     # 랜덤으로 폴더 1개 선택 (현재는 각 타입당 폴더가 1개씩)
     folder_id = random.choice(folders)
 
-    # Google Drive 폴더 링크 생성
-    return f"https://drive.google.com/drive/folders/{folder_id}"
+    # MIME 타입 필터 결정
+    mime_type_prefix = None
+    if media_type == 'image':
+        mime_type_prefix = "image/"
+    elif media_type == 'video':
+        mime_type_prefix = "video/"
+
+    # 폴더에서 랜덤 파일 가져오기
+    file_info = get_random_file_from_folder(folder_id, mime_type_prefix)
+
+    if file_info:
+        # 임베드 가능한 URL 추가
+        file_info['url'] = get_file_embed_url(file_info['id'], file_info.get('mimeType', ''))
+
+    return file_info
 
 # 데이터 저장
 def save_response_data():
@@ -371,11 +387,46 @@ def experiment_screen():
 
     # 자극 제시 (5초간)
     if st.session_state.show_stimulus and stimulus_elapsed < 5:
-        media_url = get_media_url(emotion, 'video' if exp_type >= 2 else 'image')
+        # 미디어 타입 결정
+        if exp_type == 1:
+            media_type = 'image'
+        elif exp_type == 2:
+            media_type = 'video'
+        else:  # exp_type == 3
+            media_type = 'context'
 
-        # PLACEHOLDER 이미지 표시
+        # 구글 드라이브에서 랜덤 파일 가져오기
+        file_info = get_media_file(emotion, media_type)
+
         st.markdown('<div class="stimulus-container">', unsafe_allow_html=True)
-        st.info(f"🎬 자극 제시 중... ({emotion})\n\n실제 배포 시 미디어 파일로 교체됩니다.")
+
+        if file_info and 'url' in file_info:
+            # 실제 미디어 표시
+            mime_type = file_info.get('mimeType', '')
+            file_url = file_info['url']
+
+            if mime_type.startswith('image/'):
+                # 이미지 표시
+                st.image(file_url, use_container_width=True)
+            elif mime_type.startswith('video/'):
+                # 동영상 표시 (iframe 사용)
+                st.markdown(f'''
+                    <iframe src="{file_url}"
+                            width="100%"
+                            height="480"
+                            frameborder="0"
+                            allow="autoplay; encrypted-media"
+                            allowfullscreen>
+                    </iframe>
+                ''', unsafe_allow_html=True)
+            else:
+                # 기타 파일 타입
+                st.markdown(f'<iframe src="{file_url}" width="100%" height="600" frameborder="0"></iframe>',
+                           unsafe_allow_html=True)
+        else:
+            st.warning(f"미디어를 찾을 수 없습니다: {emotion} - {media_type}")
+            st.info("Google Drive API 키가 설정되지 않았거나, 폴더에 파일이 없을 수 있습니다.")
+
         st.markdown('</div>', unsafe_allow_html=True)
 
         # 자동 리프레시
