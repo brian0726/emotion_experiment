@@ -6,7 +6,6 @@ from datetime import datetime
 import os
 import asyncio
 from surveys import survey_mfi_screen, survey_phq9_screen, survey_tipi_screen
-from gdrive_utils import get_random_file_from_folder, get_file_embed_url
 
 # 페이지 설정
 st.set_page_config(
@@ -116,29 +115,558 @@ ALL_EMOTIONS = [
 # 감정별 미디어 파일 폴더 ID 매핑
 # Google Drive 폴더 ID (각 폴더 내에서 랜덤하게 파일 선택)
 MEDIA_FILES = {
-    "기쁨": {"image": ["1fv7FADmEGxoWsa0nneM4H8SAHJ675Anp"], "video": ["1vo_HVDroVQpP8v6Z1c31lCHSB4qaL3nF"], "context": ["1wx8F1aN1SOWfaaawdSYB2KoNJgBD_BuW"]},
-    "분노": {"image": ["1vfb5T2vOkR_WxMIMi-N3BQ5rwJlpEVUq"], "video": ["1cg0ntXkmqQeOT-DAuPDARqoLlqRCosxB"], "context": ["1iwFxh9buPcbqfv1djj2YUUEJISiK5vqj"]},
-    "혐오": {"image": ["1jw5NO36f243Sp6wplc1R8JklLz06E3iC"], "video": ["1nRjJ9QZvRI9c578mErvotY9KfBw9W0Js"], "context": ["1wM2Sk6YvZ72ANBfBmAQ3ewh3tkMf2Rjg"]},
-    "중립": {"image": ["12pm_q_pUJArqGw5l60k1YZrLSjBzMU4Y"], "video": ["1HJQvKSyFvMs3OluLARkUxWpt30PKf635"], "context": ["1xAzFkRlooY_6HusRd-X0zT97Gdz_agCE"]},
-    "슬픔": {"image": ["1Z439Wc2-R09I5K7g0TGDa13qAGI-RCBp"], "video": ["12s0z9toDX3lfMRcdUwjQAyfgUvG_TlFo"], "context": ["1iOAH8hTOKcrwCOLyjf-z4HKBwM3uE3e1"]},
-    "놀람": {"image": ["1EzGRc3b3ZrJ5KWtIavg8J7qoSHHRY75C"], "video": ["1025BftCg08x2809Ci37LcMYxzGOiFB2p"], "context": ["1TEKMRsWts-8SriOI0up4Hc6MIoF9IqO4"]},
-    "공포": {"image": ["16ab_8uMPXYR_OWhwn-GW2z-FCyEdAUXb"], "video": ["1-AkeI0xWrST247vDNR9KO-km6fJ0y188"], "context": ["1rO60zjXGu5K0-Xm72dktsQGE7Uv2vRO4"]},
-    "즐거움": {"image": ["1cMntV216JiXHrRyBJ4JKFaBnt3tSD5-z"], "video": ["16Uol3om5G2MLIcWPh25RRptsIxeWR3G5"], "context": ["1U2P9bnp7_sVYCqa86Z6_I-gm-4camQk-"]},
-    "애원하는": {"image": ["1QEHraj991BQIqT5MJgzoaLeD0eyzf03p"], "video": ["1L8N6J_mIO0f4tAb7YoLY8LWp2s2qSam7"], "context": ["1JF6O1eZrbI8OEkWzJdfPsJqsoARyPHfO"]},
-    "실망하는": {"image": ["10H67JnwDeUpHnLuIuSE56c7WjzKnh000"], "video": ["15oOTzsVi8b9PbSj_DKkLEDuJ09t-opy1"], "context": ["1hpmTQj2czi8DL7yRXF2ox0q4oNwGd0YF"]},
-    "공감하는": {"image": ["1HzvOS1xzUfGHD8-rA7CHnTaQ_hgsXbQ7"], "video": ["1hP8LLCfhZSu2lWuA8sg1rKw6kpvbcSjq"], "context": ["17ZAgZv7jdPylW9SFi3kWWfSVBB4MEFAV"]},
-    "충격받은": {"image": ["1KtAQgBFDt62LL4mdi7CaDNZ_pprwmVhx"], "video": ["1mkZB-sVrA1nwp2HmxCiFL2hGB3TE_pfR"], "context": ["1ZAaWg3TYJX7lYH2NBO3Z3pz1b801KRFf"]},
-    "질투하는": {"image": ["1gE8BrJsQXvTa_SDhM6Eu94zc65wW0lmV"], "video": ["1l-5bTE_vjhCb0jGERr9qmm-7uQYBuLTq"], "context": ["1xPCmbzEPhM2OKAAVTS5b26iRUflu9Bgu"]},
-    "초조한": {"image": ["1NLvpmf2IGIkGWu35MjcdBon4qOfWUxpY"], "video": ["1ZqAWW2rKsoU-eFizdxbM2t8CF3R3H7D3"], "context": ["1x8E8Tj3A-6oUpA2-68OJRqnyL-X9nRmI"]},
-    "안심하는": {"image": ["1iPOFbVATnloUgSoEjkuYzFHcX36eBHSm"], "video": ["1w0yZHTAnhn1PVUx92lw5YxAo_dy3OoNH"], "context": ["1Yyj6mCKiGGevfk9mXlCRb1H_C8cbTF2u"]},
-    "우울한": {"image": ["1TjfDqWOUtlKj67dL1vGPTKEUcQy0nchB"], "video": ["1iW5K_C4D_ercmX2_v8lVZNSoT4eKFb5t"], "context": ["1co7QJqn80bkp0fUnokdwQqYUPaPiS6IP"]},
-    "불안한": {"image": ["1lxmA_sDqh0AULA_9ExbDgRS9I_2tFeP-"], "video": ["1NvrXor0niKLCjTfMwLYkmIp_jVYChuRZ"], "context": ["19wgT5CeK9AzKp5aNulf_xlyngiaoDohn"]},
-    "사랑하는": {"image": ["1iT2-rFgOoerKsw9gi6zvYfQbdVESAw4h"], "video": ["1jI4h6X0ial8Lh93u4w6nloufAjk36mFA"], "context": ["1esvlLNRFCtKlB-lhNsEOfGphuSv0-hFF"]},
-    "쌀쌀맞음": {"image": ["15m5MXNTNes69iQDlfkjqTfjmnIR3HFo8"], "video": ["1goPaSkqoC84fOgt08Fo64edMJgeWmU1g"], "context": ["1uAUculDrvbvMJwUYg31-LJVvWfhUPaJi"]},
-    "활기찬": {"image": ["1iIJVmfhRV49TkfoQyyVaf_w-yoLi-_t5"], "video": ["1pbFnZV5ZVjK9hMaAtR11K91koEOKJpz_"], "context": ["14TSi83RKKEzb2cYbKIZxViwqTYsQs3Qb"]},
-    "쑥스러운": {"image": ["1GMO7H-lHEepT2ELFrOtVzdMrsKpoG3o9"], "video": ["1lU_KfpUJjyviW6htZUjmJ3HzDJujqj5C"], "context": ["1vgekNQin5r2yi69FiSJubQ1bLAxFHvkj"]},
-    "진지한": {"image": ["12dEIGSDhLCh438jiMfV-XI__HrDrotgC"], "video": ["1GWhCpYC1BKLH7znmZsFFH4KLtLcR2ZDx"], "context": ["1ZRv1MbRZjdQuO8me_4eCPz0NWGzAwX9k"]},
-    "창피한": {"image": ["1wHbSk5eB2ZDQGJAs0fsGyS6y186zzu2b"], "video": ["1L04KawJrNgHiR96z13MuZSnRZkt5QjwF"], "context": ["1YVo1ztd4W9afbpC_YCOcorqrnBzO7Cqn"]},
+    "기쁨": {
+        "image": [
+            "1Zkses874-UuG4A_-__2duE51hep6If1j",
+            "1Ont1RcegoaFfrI3219Ikr8cXV6uvglqL",
+            "1YDoBo0czkU66D95JgdTOI8wbghLZoAmy",
+            "1ZNeCT6BzIkCc9Qlhw0FWDZC_tASDBIh1",
+            "1goWcU3wQ5S0xjDzBZV4wVhfYnXUeR9q0",
+            "1KScgP_iHlFO5tUwC7QxKsQpFLkvQLr3I",
+            "1ACWVr2oSo7N9LQ02kpQrZu4kEed-Us9m",
+            "11x_5wwj66ecDUWsnFJiLUaH3sZkAXYFW",
+            "1IF5BY2xkpnlQ0wMesj3x78T5g71DQEul",
+            "15BaFON-FhGkJO0eUOoik40UScCZTIr9x"
+        ],
+        "video": [
+            "19zOp3h7wL8FT6EoVQ9JGL4x8KxDsy4Kn",
+            "1-cJzQBdo2p1FpVx1-x5L4eMBWGWEGfXd",
+            "1vYvkcii1mnXXmoAfyDIBLAXY41RUaf4I"
+        ],
+        "context": [
+            "1Un6MX1QS-7kLm0TmF5HudbCkvyztIF2q",
+            "13gMPrItCCJcaW8xMrV3kXF0XnCKsBvl_",
+            "19F3WwhiXLh6f5m5ucwnrm1SbJp0IuNmr"
+        ]
+    },
+    "분노": {
+        "image": [
+            "1VyYa-SGDfELBu-19pXRjhZWoTuyyjHFx",
+            "1yNk544ZLUVlLGkjGc8Q42QPortVKgcVC",
+            "1RTq0IDP6m3_q71VXfoFNDkmkeCBDd1jo",
+            "1pbConKsQ5OqEtSESJmb4f77vT-yvcINe",
+            "1CsNLvKePRqwbyh8oLCd223B6Ft5GsPBa",
+            "1A1kzu7ZPxJ4wAUWkxOLb9SjoFzY1FESn",
+            "1YlshSNqtyBhn-sk6_BZlWEwUwno1_9ye",
+            "1aYU0vm90-qF9xG0IdS67rpOmMaaTPF1p",
+            "1H0y4rd2-EU7_Eeg3NCOJ5L7-GBzifiZ8",
+            "1Aiy0is6ZgRPoupamjR5pky92JvqIaM9f"
+        ],
+        "video": [
+            "1bu6w9b_6u24EptxHGBs53fytX1xHHG7t",
+            "1T-IDWjNPU73wy97QHJMfd3FhHIo-8mBD",
+            "1VceriH84Mqo0UKcuodo4xJLkQZB7SzHf"
+        ],
+        "context": [
+            "1lBHrhcS4kuKvfXBqzRzlUMHcx6K-fiCM",
+            "1rruwzoXikyzC3W1vPECqfxvXv5H32Der",
+            "1bZEU7n2L5PFBE1CZZYkN_hrA3OIcgxdy"
+        ]
+    },
+    "혐오": {
+        "image": [
+            "1z7RbUW2oLX3_m9fiyq42Jaq1dVwhhvR_",
+            "1SifkybdXOSoMlapNUJXmIqX3YrSXKRB9",
+            "1_QWtJUdNYcRCj7WqamFe6-w7jx89cSr7",
+            "1BkbZb3Rq6Mn4XOPNSy2Du6N1LvRjy7_M",
+            "1T6KZK4DwaSOURIx8qoub0rOZIUv-8Xtv",
+            "1qnCsL3HSqcjWaAb8aPdoYUuM2KxmB7gP",
+            "1qaJt3mMCUYVLgP7mb76IhbIDfAGBjBlZ",
+            "1Zbpt-dC9WBHLQMujcAofEXcFXhW5mYAX",
+            "1OJOXwx4Yh6ZAW5zjJLL39v_9CDYEGUAo",
+            "17Oju3H446qeuBfl_c-M10e5uTcXwA0qi"
+        ],
+        "video": [
+            "1u4IxhJz-z_OnQTQIJY9GY0Tt4Q_y9J-_",
+            "1WxFe5p4seNwUexmUxL0MtI_4zGkCXaz1",
+            "1KArVjofwKf6ZrGN6SJqXIIUwetmRgZt_"
+        ],
+        "context": [
+            "13bpNPsD5CyZxLHvaEmzvfFKzUUgys3zn",
+            "1BNnyLxErDtoEYGm4jc3EcFypKcqtLmgP",
+            "1VF95OjUmRL-8HIRrv4qwBuj-m1xFrc6Z"
+        ]
+    },
+    "중립": {
+        "image": [
+            "1o3axkrf0tQFYDduYwIHTMxTNcd1oThxJ",
+            "1V-VoAiH8b7ZwbNgVCYWLe7MrX0S-cAYw",
+            "1NIVdvkHgTK7dsNwPxKvEtuc0migiuFN1",
+            "1ZM5UV64L21s7C8vPVWnJzdtkZTmCtbt5",
+            "14SX1OHK4ibPDXG4pORRxPCySjFbt3219",
+            "1ZvfUS0TsdnHTgQax6g6eOTMoZL6yV4B-",
+            "1GVSu2JF2t1qmCgxvRFhFHuPkVa3wO4dc",
+            "1BghGYzNdZBOJUBWgVIPi8h1xdAGzp4H1",
+            "1541RJRVWZF1S104fAKe7TXJwmV6cylqo",
+            "1j1pP8gRHSY-Xs340M-wBW-ApcGInQgoh"
+        ],
+        "video": [
+            "1VO-yaXMD4e6GnpL3a83sxamgwrHbk2lw",
+            "1BY8XN0giJoMJrgUMAZLzxeh7vz6aFg7q",
+            "1gkvRsNKp4G_oZ4YVZn1z3xBDncJ0EZmW"
+        ],
+        "context": [
+            "1bsPS2bkbq9avGVDP7l-ybF4lnjQMM_VC",
+            "1JP3hydA45UGkppggNHWOBqwtS4xUo5-K",
+            "11migpkDDR2c71dmx7sNGibGkNfNdLRd3"
+        ]
+    },
+    "슬픔": {
+        "image": [
+            "118d9zexPwNz_98JxwylMD5m-BG4PiJV3",
+            "1d9BUmNdOc-briQA_v3fWNk7cRkPxTGrQ",
+            "1eFibJJcj1JliqesA_m0WKJ_Hl5maKXcs",
+            "1OX3DpxSdXV2qHgNXwuS1uoWJyaM6ffUP",
+            "1c5HvsqUQvl6S7zXuFbq5rDZF7g5f4_LS",
+            "1FDcsqOdxtS_zihYyu3ZaOjwGHsjClJu8",
+            "1z5oDFI5y-CIhYTo4rGakOdsbDy8T3GM0",
+            "1vF7OVXQt1M8YbSVFdNaB8ZnYnwqGay04",
+            "1A6-9FUlF9L74-IkSh5OMpLbSlJ0ffZAf",
+            "1Hf-3FOQ6ecjoCufqqL1TlW0tw6eJZou_"
+        ],
+        "video": [
+            "1cvo0Thq8sJ4pDcZ1df9ElF9Atg8ZDOI4",
+            "1wmT_ujjXyA7OJr6ySJxhABUaidZkjoRP",
+            "13HXjWJ5P2qfzYOxbSxcGAIkNLH8vwFFx"
+        ],
+        "context": [
+            "1n4V78lvO3UkAAOvnzy1SHLd9OW3fHtWN",
+            "1wXmhubHUG-uPU7JDtRX5-OSHun92-4xj",
+            "1i5Z8RMYl_-aCit7o1gYrbrMDi_0Y_U5T"
+        ]
+    },
+    "놀람": {
+        "image": [
+            "1uuStKLAP86HPSKGJNr3aWAmLxFH51yVU",
+            "1grYrpy-ekVnuuh9wERese3TTSW-swF4b",
+            "1WD_eW7fKXbeqaUh_QZsWRR10AcoI-lTQ",
+            "1UJCp5G7Z3-VgRIjnSFCArRX-v67CGidI",
+            "1Nm3gOeDZIf7Lybt5t5EqaqHOXizkI8Cn",
+            "1U8WLiGm7KqaoozbiQQef2llR9Acs78WN",
+            "1BaO_6KCaaJN4MjIFQcrSzlPeesIBvFqB",
+            "1iTmPwv-BX4Tg_5aMtpxDy-TlICYA9nSv",
+            "1qxvwW5pdGjjVThGonF-9gnXgnA-sfGW2",
+            "1X-_Vdlv3la5zhiqAJIUyjrrJVEGXiXEx"
+        ],
+        "video": [
+            "1blIln92Wo4ehBtjZz_gU1Dq6kHm-j-YM",
+            "17_NfYWvbIaY36TotghCWdlzlV2RHtQ7J",
+            "1HpnppSmKuhdSRu6mZvEd9hFUVHAuZ_RU"
+        ],
+        "context": [
+            "16yAYsYk69Y0CXm4dnIoWkaKkpJcTH8Z1",
+            "1BANdKftx8B3AWcIryoi1qz3k2bBvrJCM",
+            "1m8SMesnVzW87-e8Q2Y6ACiWtDzrmIyLl"
+        ]
+    },
+    "공포": {
+        "image": [
+            "1gJsvNkuG1oYedX7RHAnxqwPa2kEkBoLH",
+            "1gDRJLO8r3To2OPpyNHip69zEHa5Cooxv",
+            "11VZbGLIkY9bhlakHau0tsOs5Z3SZc9Uv",
+            "1qwQBEgfYmh8gnQHQmkNatp_9Mxh25sDT",
+            "1uOzTkm_1rqZ75fA-t5K77sBSIAZQBiW_",
+            "1_kJa93LQGmuBGd1RRB3hA6x8ctf0H5JV",
+            "1Kbn8uxVCFlQylyFUBQcQfAOj5cjRhLsr",
+            "1HR_md5KsS34qFjMJRQPlXIXUob5_MAHC",
+            "1TA1Lhg2PFpEGNI9Ck4rp-BOPZaM7mHIr",
+            "1XArooLwi_83v0deH7QrZ65i9QgKC7scx"
+        ],
+        "video": [
+            "13IINEhnsNpFzMzT55DXuF0jYaT27jFNI",
+            "19236LY-w-VuPjY_OkjQSag22C-xC3JTM",
+            "18cskG3qZr5xSPCBet2bQBBfHiL0CXD47"
+        ],
+        "context": [
+            "18DWIxQZxSt5nzKJHxkcOU1R9rdpd8kC8",
+            "1phlvANn3TVrF6ZNvmGnaocEajzagFzQY",
+            "1tZMhmdw92XWnjf4c7EJlNkVFUz-iVb8b"
+        ]
+    },
+    "즐거움": {
+        "image": [
+            "112PtmXlqefjBItCkDaumBv2WPiRpG0c3",
+            "1R73RTEf52kzeLwpIeHcOWi1sUwdAKeKx",
+            "1RnlVLC_ayERCD3vtpQs67jFk7AllfdTA",
+            "1h_pjV5N3Cz_Q7iV7dcbVlLd2kEBTS7VW",
+            "1srSl6cGaYRFFG_xHBVSzAkGVWnRfYu3Z",
+            "1MHgWYpyeUtZh9CjuHxtsOFzZ27F03Law",
+            "1aBFJgUP1EELhE05y3A2o2_34hAMgbx24",
+            "12bjcT6sY_7qy0V8Xf86PwSEikFvqAO2C",
+            "1PsGZ7IDjsMGq804W71vprNAK_xZ1u2zE",
+            "1kDmUKgtKXmfTFlPSyW9tAyJBFVEGLGaS"
+        ],
+        "video": [
+            "1CI-vh-qVyEQN4SxwXPVo72RjWbJRRt7u",
+            "1aR_cMyx7vhzQRnuh37VhNOUCFqV9siBS",
+            "1zUDbwYhruSirujaUDHxdw8Je899vsyr6"
+        ],
+        "context": [
+            "15Nl1XNAJobohl7XAnqPrXbbrZuS7cPx2",
+            "1C4EslDCeJzf7eToN4rH7NXj9B-XtHpbn",
+            "1pZ69s3zzmUxszNZI-zkdJXttKOMIQVfD"
+        ]
+    },
+    "애원하는": {
+        "image": [
+            "1XZyRLCzAgQGQIiYh-Nih4pogDlttMpF-",
+            "1DfX94HaHrlHF2eEQBQ4fGKtAGSmVfwep",
+            "1d4aYHfVGglv50lFaTjTdL4-YwRydjk5P",
+            "1uSx1RZpSxtlW3yQ6vm__PIWEVDZoNBYZ",
+            "1ptytZ902IAf6WjuXv84wN-wnxRzkEhzO",
+            "1I0eqVqCdqHBSM4SEqMq7rkJ183ZbQTQl",
+            "1KV5RoF6yz6vg8TS4Y9Us2cXSLcGXjhwD",
+            "1-NCTLryz3BlR1YyQfizsTn7zbOvRz4hk",
+            "1QY4W43mrrd9oOVvdmDg9sf5tZpnokoYz",
+            "118VxRXMX6RlYc0FbztRwjutGLa5vDC5P"
+        ],
+        "video": [
+            "1sF1_xsKRgZEFTE0XT67DBvpF-GuxEc0B",
+            "1ptxVSYugmzG8HdhGKVVk3Nc67cQPJ_yk",
+            "1UB4bjS72Pj7KENpzrP4bQOeTz7JyO-qT"
+        ],
+        "context": [
+            "16WEzsmydI7EagRlCH1rbk_EijfaE-EG5",
+            "1oS_dyva010wLvXazSJtTbFCsVMDoQ7ZZ",
+            "1Mj_B-sexOu9BsgbJ1E22rkRauCdRs38u"
+        ]
+    },
+    "실망하는": {
+        "image": [
+            "1o5J9EtZlEx7x_DudTXyvoqeide7kr9It",
+            "18rt2MOhyr22GNeEKGtnIKXOZGezp5Gs-",
+            "1_Orb3QyflYU-S-wEcL4SXBe6J5yE8QT5",
+            "1IcWLYVdQvcC3OXjJtR046d_7Edenufdh",
+            "1qBfPXrd_bFZsB_cfzxR_fiYFEjL4lY8R",
+            "1Z7KOqJUFUSAcwDxyam_74nDJGOUwmKEm",
+            "1CZQ80SzfXBEpf--pYMw35HWKtffR0w1R",
+            "1W-w6Hsiyq_V0CJTisrV5giUsWA3B8cFr",
+            "15HnH5vMPtqN_ngftcIUh_eaIjT1OyRvF",
+            "1jgeaqzD_sl4SiB31AR3MPNPGh5wI0f_5"
+        ],
+        "video": [
+            "1ZVFo3j9TPmj5CerpU8QnZyCQ5qtoOXVb",
+            "1mb-XYXdTN5VHCE8T8Lu7zSk7kqOv6aMb",
+            "1xiNpA4noSX3ANZq0MS8-gE8qmRyVe-ci"
+        ],
+        "context": [
+            "1Xwq8LvXjCknv_Eaw4mZAaVTji8xuxVPi",
+            "1I_IJ46lrkQA5CDQDCEvilXAkOtAYR4M2",
+            "1Zup3KYF2EksSlft4V3c8dftW2Q5yEbVP"
+        ]
+    },
+    "공감하는": {
+        "image": [
+            "1-t3rI9DlAEeVgCHMQb5yJ7_n7F91ivdg",
+            "1wKtXR6nFOEfrJhlq1NOLqUGJzvwha92K",
+            "1p72c4fExtfdMODmpPKLyLDKNKW-FukaE",
+            "1rcaUnk4Q0bq9yz34a5xJpDnkvBWzjqsV",
+            "1ex5unpqflQG6FVLtzI-QKIrcC1yZnJfW",
+            "1F9kHnb-TCZSeVDSiPB7AEyoffbJNu10i",
+            "14lVezFoEuIWx-8Sx1hyJkpR5YS7saYuE",
+            "1YUjvkIaiWigPX48rERZVnZ8ZT1ToYrrX",
+            "1B01kPv5gXe50jO4LrjQ5rZ1xu79-7nZ-",
+            "1d-UiV9Ofm5CcX8KYwvEaAWn5BL7Td8Ph"
+        ],
+        "video": [
+            "1qB56HbOKhF0nHo0lBQ26FNztxZrjLxU0",
+            "1ZuLJCcSfiw-ivkFZxbpcq4E9x_EsHEV8",
+            "1B6eHMWZBOuVnNbET7eHHMhqNPfDzBxxa"
+        ],
+        "context": [
+            "1N7_WmBWS4Qxjtfj1DsEe6ZQiuXY1Qudu",
+            "1i5ptNqPkJSgzhaGfO2D7IzkcBDhwPKIm",
+            "17qs3jQ6k92edbtXDPWC___4uefhM9yUd"
+        ]
+    },
+    "충격받은": {
+        "image": [
+            "1s-EE_rX9LWYDE3Vz9fR9GM6Xns1-2MBt",
+            "1e53WPphyj8r_XL2tkrnyPahBt9KstXbu",
+            "1Z3_RKc2NlWkGOPh1nJorRop6bZI1CNIZ",
+            "1olpcVbblCkoFVNXgA34r5U0-DLarW-5v",
+            "1eO1CwuCfqyKFp7iepWu3rO_TScPuqO-3",
+            "19wQmc4ZAlw5jEwvT437uxLQtUo0GLJ5D",
+            "1JOge-TGUzK7kMLsWCShLBv5OppM-UrBC",
+            "1U9tH5jeXJGlMlGotPd7UyngMB-PjE3Lw",
+            "19VedfPAfnEyJOwuCK_Vje17NVcSvMaOc",
+            "1ojRDyU679bh9cGjNqUOVXUnutskg19-4"
+        ],
+        "video": [
+            "19MienRQ9c55A1t3iQcVorhlRag_O7qou",
+            "1mfWTi2e2N6xz6UdZk6V7Gfp8xCR2z5Gj",
+            "17J5wxHNbWyhniNAe1XCEFA4MPhXxtaH4"
+        ],
+        "context": [
+            "1zqJMZafmwDx8wbeyeWvuSl2IAdlS3K9R",
+            "1KY3os6-iU-Io-Pvl_6E3uOIQN_OMFoTA",
+            "1HVhBSU0ZQYHT6LPvHqNcCxim7WOZ3f_K"
+        ]
+    },
+    "질투하는": {
+        "image": [
+            "1_ExilbNsMPTn4eoD74qXQVJ0XpX56UVW",
+            "1bpC3Yl3HEqO2G9-dTr336q9QRmPeUXIO",
+            "1j1rxMzshT-g-GY5eDxNwVzt0EIWIzeuN",
+            "1w-rS9wei_TgMrHAs-snmmAXHreaG3x5k",
+            "1qgBo0pcRXQSRRrWTxZ9e1RPgUzb3vPcj",
+            "1h8e94bcJ3gDf0m5OVVXPVAJuUjQEGiQF",
+            "1SASFp0cVdAqSdG7U6s_8wKtT5XL192RQ",
+            "1CebtnHTKC5O9W-eHeHGtU8_7tDq_b_RC",
+            "1guE52RR9Ou6z9ddxCGCEFQaqKEbaCHGC",
+            "1ZEJA6erLYsHpANmv4uYi7OU5XhurZQoG"
+        ],
+        "video": [
+            "1_tXYi2spgsygNkstFvWjuUNnyjBf-KDZ",
+            "1Ke88fKlLSg7pUFHpJlPCmAeDbWOp1-gv",
+            "1_OTyqD4iiPhjH52YHCcX1p1A4N_z3hZY"
+        ],
+        "context": [
+            "176ZUUprceTdptFxL7BUxASWnNZxOj6m3",
+            "1B_QST6J_n6QJp9nAhX-Ir2axX6BQc7xI",
+            "16yqXbjtk5x0ZOGjGJrbVG_0QdGKzKQVZ"
+        ]
+    },
+    "초조한": {
+        "image": [
+            "13ZYG8Ugqqv8bi6nPVMwkpE5Vb-I72qWU",
+            "1YQhHtoUEUt_bwaOyLYtteDVQXP-Lujpv",
+            "1ezdr9Qdk5c9qdBt9DnnCoVJy9TL8cg62",
+            "1I4xoX6SG5hLdxPCpb75958jEosR5cHbS",
+            "10JYOkFUWYqsQIG5C9w8EUere7oKOZvkb",
+            "1fFC2LVmAqsNGZZ_sDkaO1Wv50BU_tbRM",
+            "1TnF5N7DGn_rREHYwJjPBjVRY8Wwn91e5",
+            "1ZM907vi8rM4fdjEYrL90WhwTUUJEkDSr",
+            "1g47aSlgtdkV0urcB26hKWHTiCpJUEJr1",
+            "1kYbpdX5EO0FEnMEb0qa_5sOvXMMrwlD3"
+        ],
+        "video": [
+            "1aB1t2-GhgII0MCxvNCrk9UU88gN8iWKH",
+            "1oetF9L5A4JT9X0RQn6nFxNuktBYEknn8",
+            "1afiVx8rQWgpDNgoS1ldNxWK2MJfqVfl3"
+        ],
+        "context": [
+            "1ekLwSmsQtA5KG9UKRz2cbtujMHCB8cAo",
+            "1O8HesklCKbaDAYpXQqXMFpO3Z_ZYYunp",
+            "1yismmj_kOmQZT9iZaJk3KAeLHjxyUNOK"
+        ]
+    },
+    "안심하는": {
+        "image": [
+            "1yg27o56U2rkaQTVU2IFnfAnQW2H-ku9t",
+            "16qPclrKreyt1L4r2Ck8vT3qvnxhAzlDN",
+            "13N0yjQGJr5wwN3QmX1wKJYVqGUZoO7lP",
+            "1wsR1xqh19-iJTvSbo5B8ROryI6xtcW5i",
+            "1lEffr6JC6DMebiNbPmUp3mUDBT6lNVPT",
+            "1hilWJp8G6tKE-qgonXv8Kao6dEsnzE8E",
+            "142R2RjS2-unId4ykeTwd0XWQRfVB0xAJ",
+            "1gbcS7A2KtK6wu9l1F8NetpRfUvy0KrdS",
+            "14fwRHnCPjpoOt4rN3lcpXCmEVTBW20hz",
+            "1BSafDzbcN6DnNm7T2tDzg_2j_T_nm-nc"
+        ],
+        "video": [
+            "1hnHQ89lAtOT4SFpxOTKj0uCjbsLmdzPo",
+            "1cGiktioy0eK_w8TxsX7o9BRmsUvo0Ra2",
+            "1R5DlcpcwduZdZvzR-6AETDtu434wMAAd"
+        ],
+        "context": [
+            "1Vx73kumEQGe3Jf5Oy4fAiIt-C0XfEueV",
+            "1bgyNdZ3kwt8hhhdKcXGMM7DBLwCBHyyH",
+            "1ITIR0NPSE_PWxm17BEqHFRLPueNoYHUf"
+        ]
+    },
+    "우울한": {
+        "image": [
+            "1IZdAViusYSeYmeAtNPJ3DbcQFZ0YMbH4",
+            "19F_3j62_aczUQ-yTJGNvVbxYvnAKVKz6",
+            "1zWi0YwwMX796J0bC_cEExHSyQZ1oXLyg",
+            "14ckBMnMBPA0T2U4mVBSQJcjW1qi4KaVy",
+            "1WDyxChA9NNW70ES9ii9iACfRGnYlB_9V",
+            "1MRbyZy2usSv78WKuxgQef0bdoafYdDad",
+            "1K-3eLg4eH071txQrCddN-YcgqxO_gd34",
+            "1uloddC8R8TugxFzbk8IHZSPW37ubFLaI",
+            "16M6BtEQ3IXO2XM5SnlOQJduO2dbCx5vt",
+            "1i0kx5XMfASnzdmbKaC-gu4Z1BEzUsY5h"
+        ],
+        "video": [
+            "17LWzO6qhibDrqqUsoEfBgV5NLcgzlKU9",
+            "1ySuABq-5OtFB5rLKSRGanDAQ208uypzR",
+            "1EwlXwkdc1ynCdhkVzoVXOTbvLNcmuRv0"
+        ],
+        "context": [
+            "1CSs023_TiIJbeq0mqlUXgHkhIAPWIba4",
+            "1FN0cM2HGRDmJIEM3y9aqHUX1DLDuPHtB",
+            "1lznvCIxXFXlmFZ6Tz1ViNKetvgV3nu-v"
+        ]
+    },
+    "불안한": {
+        "image": [
+            "1il7LdJBVRe9Sa9CYpewjO6LKVwLoVaMV",
+            "1QqhZdNLhxFDFyT7P0TjjqPBNahZpnj63",
+            "1_IBHaYmpNSZ1C5MYCQL84V2AKoueFnL_",
+            "1SEQlAciBoKMbCs4hunRIadCQZQMUviQY",
+            "1_c24vmQGVKtM0OsLf0Bw7gCpl7nt-nxI",
+            "1tz52ybD99jSCLxUNS67Kll9SPiTj667b",
+            "1tB4ve5U1ibYnNF00nnAB2PJjovm1ABCr",
+            "17VWt9qM5wrYWHoADhZBQ00TeD3dUDwUP",
+            "1D2bWJddsteX7X7HXq7gc1jIrA896N6tW",
+            "19oEpwI-wcxt8tf0V_-9-RqlhvzvNTv1Q"
+        ],
+        "video": [
+            "1v_X718rja0aeuqeIFFl3NUaDzBBoOap0",
+            "1ZiLe2ncqEvG5liskt9lOi2q36Vzw-nt2",
+            "1YrY6b0qcOAuKHe6TPWf2r-kDDAJbfO1S"
+        ],
+        "context": [
+            "1q8uKAnUCy4KFdoYu6BslsZi6kAZYDO91",
+            "1iJ-G1uGI11lx47a288SiOtFMKbw2hclE",
+            "1gFK7k0hWGAGCkj3ncgbOgazx1yvlVIfZ"
+        ]
+    },
+    "사랑하는": {
+        "image": [
+            "1naIhOwztDkUgGj6vf2nipy6TK4m77Ynx",
+            "1cgTEabUmY6roPmTxAlC8MCkzgIRdIplQ",
+            "1Bqwoi_2dJeEXqvh4-2mj8P6qRjnU4aex",
+            "1NiMEABTc9kSRZoRE0R7_H_o3v3XEZJ7p",
+            "1XeL6exS3JRje6uEjISIpORL7jLC3tTJl",
+            "1DFIbXy5y3VdAzhlIK4P3chBp_45Zjv-d",
+            "14uGwp4vtrVqDkO_UGo6p-z6yod0dAISL",
+            "1ummVZT6er38PG9THNSS1jFF4e34LWgwp",
+            "1a7Fu-bqMcRis6J4mpAuGqcASbJrUyw1a",
+            "1LOLns7rS_8x8TRQLICYx-H15UyHKLAAZ"
+        ],
+        "video": [
+            "16CKJepvy43eibCQXBZWZumkBf9ioJT1D",
+            "14cmVML61JJjAN8NJFWBJLzR8ryoeuxXG",
+            "1n1L-ErSH9jSz6hrDyWoXW9o-JulbLckM"
+        ],
+        "context": [
+            "1DOrMddv00him9-FVESkO9bIRFjY--J6l",
+            "1yhSlBz10mLdT1yQvhZkqXYG6wDLrfXR8",
+            "1StJkHoc_N2phRmEeLgQ9mgvxO3djLD_9"
+        ]
+    },
+    "쌀쌀맞음": {
+        "image": [
+            "19gBo_xGykoXp2Jqdcv5BhyL8owgz9naI",
+            "1-rt3OKF_Ap1_uY01DeksIrqpMj-ud4ki",
+            "1HHHF7u-Fe6aKIBxS03t5KeVbhXWi1nct",
+            "1PJQRUvWikyUtN-SMC5dXArs8KaKB_Ui5",
+            "1elrZmvp_wTbNHQozOxTbH51g5n6Zm51C",
+            "1WVQbbQJXEZEttk-tkA8lSGSejap7iCY9",
+            "1sY0mUrbfrLpP_jwi4DFHYl_Uv3BzXxfS",
+            "1VHJUJXa4uejwDlvOkWvp92BfI5TJnA5n",
+            "1-mw9OLenR-WM9PH12W0e6I122EgsrojS",
+            "1St2jmjluZTgPPBfixRdaQc8yxfquysZI"
+        ],
+        "video": [
+            "17LMxnM0vluzur-agj1SHBECJOVtm-cRW",
+            "1ArjTUEJk0BXEIha5YwMuXvif64glo1eO",
+            "1pujHvlECpq8DZd5mch2NgW3VGVOr_6_G"
+        ],
+        "context": [
+            "1y0q1Uo5maCa2V67hVcrtfkBMVYadJVnJ",
+            "1w4ZzGWfTwHCtxr2ZzmjyZtv2oIbyipjx",
+            "1CvE1iVkzaCA3NXSWM5XyfpMAZgs5ZRKE"
+        ]
+    },
+    "활기찬": {
+        "image": [
+            "16-fbchsgRmMZ5uwwXof3ktoExzz5wbon",
+            "1B9yhZT491WgYv-2Dp-I0h8c0eaTaG1iL",
+            "15pvToQp3xGfw-kRw4Hxk_L6jKxhJhrwI",
+            "1NCTwoX__zMIVz5nCJ7zQ3-IrGq2KRCVa",
+            "1OJE3tua618HWGSkPrDiwWPVWELrkLUe_",
+            "1R7SpK_A0AJR8Gzym5wbqNLIJOO6QzTrK",
+            "1vs0gS8Erroi483aAIPYSWS1KFv8cTDhk",
+            "1i_Hyq_r4mJagxIJ2aS7Qeoq13REwS_SZ",
+            "1zFiqs9VVg3lgTr0aarFESYgnUXj3EvvC",
+            "1tcOgMNrZueH6AGsbpey1aXV1rfYRF0TM"
+        ],
+        "video": [
+            "1giiHwHtY7cHNElkZjfKLpT5k8xBO5UCt",
+            "1n-zl3IH14aKP53JtXef8fHHPhnDJLcG1",
+            "1SKRDUaBl0ynhQWubmoHLMJgA6ZU-2Gjh"
+        ],
+        "context": [
+            "1fNDAvyvJGHZQkrsVV1jXR0m172Pa5D3N",
+            "1EG4n336OcAaMpvYXz3aS0APf1yFLsnC8",
+            "1JLNnQM83xuoIWPkjdkqfMYBstFEbc8Gk"
+        ]
+    },
+    "쑥스러운": {
+        "image": [
+            "1SkJb3QC-e9K3g-yY7Ukkh5sYZ9bdHzw_",
+            "1C7YCCTaWnxJ1gqhaRElvqT7mnGgyR1Mq",
+            "14yVqI6_2CJbgOC20BPvuvxlEKKQ5jnrg",
+            "1utfacXdr8nttHC7EDFULpTizVKfIwirY",
+            "1B2uVtlme7p3kT64ir0KdZDJ0TMX0ScBz",
+            "1WUywCYwXchesPthyAnAj9dKbHkUzyYsO",
+            "1b0qS-k31i6oXbmNOWHPtJXwZ0_cdzEIa",
+            "18sx-tfR3G-T2HsZjGH4pKcWzDgRs4nDV",
+            "1gJmPdYbYVQlBuUEut3UflVfbP53niDOt",
+            "1oJsubgrET6VmipFoD68pG1g8OxUAq6eN"
+        ],
+        "video": [
+            "1LMcHIAl6vpI6JKAVOwgxKVMFQZYlzCel",
+            "1-QdftnJuPGDBmHC6or7Jt68ZlgMQK0d2",
+            "1iCw2Jvdodhm38WGLPiLpfPCxGFzigBIK"
+        ],
+        "context": [
+            "1IkJZN7WKxHV-l-wArbp1JiJ7tsqXtO59",
+            "1PiCiF_6GBmQyUeOzBG2khPS8lbKwvwVf",
+            "1WlHszji6fJPx7Wb-lgTk6EL1u9qeonub"
+        ]
+    },
+    "진지한": {
+        "image": [
+            "1tr5J6hE9DRMbQ93cPpE4js0wFi4snFJU",
+            "1kYgYWsjJAQtkpRBQ5eJRxOStuio73A6s",
+            "187bgu-x7EyKRYkHLQny0-us6801nN3nl",
+            "1UTapIHXU13yCpPVC0feHkUNJnP7vEJ1y",
+            "1sJf4CKvNgKWEEkSeub5AFW6rk2LCxGh8",
+            "1fZw_mwZtdwofNaFR33Q3UJXX4SThWN_j",
+            "1U79pceKbHt3mp07gBu8DXg4V30XK_nxR",
+            "1gMNQs3RCvdqh99HriSJQoFogoSAf39cO",
+            "1s9u3xNZRvZUgAd3Es162GzQO6sK6RWRQ",
+            "1nfjY6PrG5tvsZqn9TO6hp4fTmhhLufz5"
+        ],
+        "video": [
+            "1s_qIS4cF8NKiNABdCv3zxkIeKtvGIqej",
+            "1aw0DXm33gZeErNXEoAmgoSYPqsAZGA98",
+            "1bwUhHC0whS6Xdzo84dRdcLJntI7EOUyu"
+        ],
+        "context": [
+            "1HyO3opc2DYrytm7wzGvCmvB5OmqX7wC4",
+            "1gNMeYlH1MbvTqmayMt3Rx45dC59Adf5x",
+            "1Dr2NiaH0T0zCIMvAcWTgLr1fhGkZ9sgl"
+        ]
+    },
+    "창피한": {
+        "image": [
+            "1GwZhN-nJb47OjyFyGsLoewhHxb9BGmje",
+            "16lbyXTnCKFARAo_OjYatYE50Vo0OUuTl",
+            "1_12mibfwd6qxiH5_SL3KlXIASxn2YfI_",
+            "1SOt0rM76325z2YrXssF3rl6evS-R-Hgw",
+            "1z5rViWNi7LGxB3BB5NhVYDBmJH6-MCyg",
+            "1Ago57f68Iw2arfAM8kjyxBQ2w0RPeOFy",
+            "1xbQJBjzafB4vb_VnRt53dQVuhN0vjUaT",
+            "19KHxViCxW_2XDqkXzgzWkv1aGBMTxgUv",
+            "1DMoGGe1vB_9t_mg6sIQBQImngKF8889r",
+            "1nW_k0t70RKlajYCKm6BQ_cnd8NfA_rvX"
+        ],
+        "video": [
+            "1eo7gOw2w7Kj7JbsIPowe0Fb0sQQ4MbD8",
+            "1yd6k7HyvZhemREhUGI3b_tppx0EZU7RW",
+            "1GagY1HfSdAESKja9gCmUbdkaMlYlzD-F"
+        ],
+        "context": [
+            "1vxFS3kflSb7HuAcnhYJCGLkGc4YbozBy",
+            "1Kbj45kw9uZBfRmz-R6Szexg1yzsKFq8P",
+            "1ZddCNLfH88GaJ31v4HlfTs9UhHyUq2GF"
+        ]
+    }
 }
 
 # Session State 초기화
@@ -186,37 +714,33 @@ def generate_choices(correct_emotion):
 def get_media_file(emotion, media_type='image'):
     """
     media_type: 'image', 'video', 'context'
-    해당 감정의 폴더에서 랜덤하게 파일 하나를 선택
+    해당 감정의 파일 ID 목록에서 랜덤하게 파일 하나를 선택
 
     Returns:
-        파일 정보 딕셔너리 {"id": "...", "name": "...", "mimeType": "...", "url": "..."}
+        파일 정보 딕셔너리 {"id": "...", "url": "..."}
         또는 None
     """
     if emotion not in MEDIA_FILES:
         return None
 
-    folders = MEDIA_FILES[emotion].get(media_type, [])
-    if not folders:
+    file_ids = MEDIA_FILES[emotion].get(media_type, [])
+    if not file_ids:
         return None
 
-    # 랜덤으로 폴더 1개 선택 (현재는 각 타입당 폴더가 1개씩)
-    folder_id = random.choice(folders)
+    # 랜덤으로 파일 ID 1개 선택
+    file_id = random.choice(file_ids)
 
-    # MIME 타입 필터 결정
-    mime_type_prefix = None
-    if media_type == 'image':
-        mime_type_prefix = "image/"
-    elif media_type == 'video':
-        mime_type_prefix = "video/"
+    # 직접 URL 생성 (API 호출 불필요)
+    if media_type == 'video':
+        url = f"https://drive.google.com/file/d/{file_id}/preview"
+    else:  # image or context
+        url = f"https://drive.google.com/uc?export=view&id={file_id}"
 
-    # 폴더에서 랜덤 파일 가져오기
-    file_info = get_random_file_from_folder(folder_id, mime_type_prefix)
-
-    if file_info:
-        # 임베드 가능한 URL 추가
-        file_info['url'] = get_file_embed_url(file_info['id'], file_info.get('mimeType', ''))
-
-    return file_info
+    return {
+        'id': file_id,
+        'url': url,
+        'mimeType': 'video/mp4' if media_type == 'video' else 'image/jpeg'
+    }
 
 # 데이터 저장
 def save_response_data():
