@@ -734,11 +734,19 @@ def get_media_file(emotion, media_type='image'):
     if media_type == 'video':
         url = f"https://drive.google.com/file/d/{file_id}/preview"
     else:  # image or context
-        url = f"https://drive.google.com/uc?export=view&id={file_id}"
+        # 여러 URL 형식 시도 (Google Drive 직접 링크)
+        url = f"https://drive.google.com/thumbnail?id={file_id}&sz=w1000"
+        # 대체 URL들
+        alt_urls = [
+            f"https://drive.google.com/uc?export=view&id={file_id}",
+            f"https://lh3.googleusercontent.com/d/{file_id}",
+            f"https://drive.google.com/uc?id={file_id}"
+        ]
 
     return {
         'id': file_id,
         'url': url,
+        'alt_urls': alt_urls if media_type != 'video' else [],
         'mimeType': 'video/mp4' if media_type == 'video' else 'image/jpeg'
     }
 
@@ -929,12 +937,27 @@ def experiment_screen():
             mime_type = file_info.get('mimeType', '')
             file_url = file_info['url']
 
+            # 디버그: 파일 ID와 URL 표시 (개발 중에만)
+            if st.session_state.skip_enabled:  # 테스트 계정일 때만 표시
+                st.caption(f"파일 ID: {file_info.get('id', 'Unknown')}")
+                st.caption(f"URL: {file_url}")
+
             if mime_type.startswith('image/'):
-                # 이미지 표시 (HTML img 태그 사용 - 더 나은 호환성)
+                # 이미지 표시 (여러 URL 형식 시도)
+                alt_urls = file_info.get('alt_urls', [])
+                onerror_chain = ""
+                for i, alt_url in enumerate(alt_urls):
+                    if i == len(alt_urls) - 1:
+                        # 마지막 대체 URL - 실패 시 placeholder 표시
+                        onerror_chain += f"this.onerror=function(){{this.src='https://via.placeholder.com/480x480?text=Image+Load+Failed';}}; this.src='{alt_url}';"
+                    else:
+                        # 중간 대체 URL들
+                        onerror_chain += f"this.src='{alt_url}';"
+
                 st.markdown(f'''
                     <div style="text-align: center;">
                         <img src="{file_url}" style="max-width: 100%; height: auto; max-height: 480px;"
-                             onerror="this.onerror=null; this.src='https://via.placeholder.com/480x480?text=Image+Load+Failed';">
+                             onerror="{onerror_chain}">
                     </div>
                 ''', unsafe_allow_html=True)
             elif mime_type.startswith('video/'):
