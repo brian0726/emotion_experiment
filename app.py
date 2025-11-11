@@ -930,8 +930,13 @@ def experiment_screen():
             file_url = file_info['url']
 
             if mime_type.startswith('image/'):
-                # 이미지 표시
-                st.image(file_url, use_container_width=True)
+                # 이미지 표시 (HTML img 태그 사용 - 더 나은 호환성)
+                st.markdown(f'''
+                    <div style="text-align: center;">
+                        <img src="{file_url}" style="max-width: 100%; height: auto; max-height: 480px;"
+                             onerror="this.onerror=null; this.src='https://via.placeholder.com/480x480?text=Image+Load+Failed';">
+                    </div>
+                ''', unsafe_allow_html=True)
             elif mime_type.startswith('video/'):
                 # 동영상 표시 (iframe 사용)
                 st.markdown(f'''
@@ -976,7 +981,7 @@ def experiment_screen():
 
     # 선택지 표시 (자극이 사라진 후)
     if not st.session_state.show_stimulus:
-        st.markdown("### 가장 적합한 감정을 선택해 주세요")
+        st.markdown("")  # 빈 공간만 유지
 
         # 선택지를 3-3-1 형태로 배치 (총 7개)
         cols1 = st.columns(3)
