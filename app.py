@@ -701,6 +701,8 @@ def init_session_state():
         st.session_state.show_prompt = False
     if 'stimulus_shown_time' not in st.session_state:
         st.session_state.stimulus_shown_time = None
+    if 'current_stimulus_file' not in st.session_state:
+        st.session_state.current_stimulus_file = None
 
 # 선택지 생성 (정답 1개 + 랜덤 6개) - 총 7개
 def generate_choices(correct_emotion):
@@ -860,6 +862,19 @@ def practice_intro_screen():
         practice_emotion = random.choice(ALL_EMOTIONS)
         st.session_state.current_emotion = practice_emotion
         st.session_state.current_choices = generate_choices(practice_emotion)
+
+        # 미디어 타입 결정 및 파일 미리 선택
+        exp_type = st.session_state.experiment_type
+        if exp_type == 1:
+            media_type = 'image'
+        elif exp_type == 2:
+            media_type = 'video'
+        else:  # exp_type == 3
+            media_type = 'context'
+
+        # 자극 파일을 미리 선택하여 저장
+        st.session_state.current_stimulus_file = get_media_file(practice_emotion, media_type)
+
         st.session_state.is_practice = True
         st.session_state.trial_start_time = time.time()
         st.session_state.stimulus_shown_time = time.time()
@@ -873,7 +888,6 @@ def experiment_screen():
     emotion = st.session_state.current_emotion
     choices = st.session_state.current_choices
     is_practice = st.session_state.is_practice
-    exp_type = st.session_state.experiment_type
 
     # 진행률 표시
     if not is_practice:
@@ -906,16 +920,8 @@ def experiment_screen():
 
     # 자극 제시 (5초간)
     if st.session_state.show_stimulus and stimulus_elapsed < 5:
-        # 미디어 타입 결정
-        if exp_type == 1:
-            media_type = 'image'
-        elif exp_type == 2:
-            media_type = 'video'
-        else:  # exp_type == 3
-            media_type = 'context'
-
-        # 구글 드라이브에서 랜덤 파일 가져오기
-        file_info = get_media_file(emotion, media_type)
+        # 저장된 자극 파일 가져오기 (더 이상 새로 선택하지 않음)
+        file_info = st.session_state.current_stimulus_file
 
         st.markdown('<div class="stimulus-container">', unsafe_allow_html=True)
 
@@ -963,7 +969,7 @@ def experiment_screen():
                 st.markdown(f'<iframe src="{file_url}" width="100%" height="600" frameborder="0"></iframe>',
                            unsafe_allow_html=True)
         else:
-            st.warning(f"미디어를 찾을 수 없습니다: {emotion} - {media_type}")
+            st.warning(f"미디어를 찾을 수 없습니다: {emotion}")
             st.info("Google Drive API 키가 설정되지 않았거나, 폴더에 파일이 없을 수 있습니다.")
 
         st.markdown('</div>', unsafe_allow_html=True)
@@ -1073,6 +1079,19 @@ def next_trial():
     emotion = st.session_state.trial_order[st.session_state.current_trial]
     st.session_state.current_emotion = emotion
     st.session_state.current_choices = generate_choices(emotion)
+
+    # 미디어 타입 결정 및 파일 미리 선택
+    exp_type = st.session_state.experiment_type
+    if exp_type == 1:
+        media_type = 'image'
+    elif exp_type == 2:
+        media_type = 'video'
+    else:  # exp_type == 3
+        media_type = 'context'
+
+    # 자극 파일을 미리 선택하여 저장
+    st.session_state.current_stimulus_file = get_media_file(emotion, media_type)
+
     st.session_state.trial_start_time = time.time()
     st.session_state.stimulus_shown_time = time.time()
     st.session_state.show_stimulus = True
@@ -1119,6 +1138,19 @@ def main_intro_screen():
         emotion = trial_order[0]
         st.session_state.current_emotion = emotion
         st.session_state.current_choices = generate_choices(emotion)
+
+        # 미디어 타입 결정 및 파일 미리 선택
+        exp_type = st.session_state.experiment_type
+        if exp_type == 1:
+            media_type = 'image'
+        elif exp_type == 2:
+            media_type = 'video'
+        else:  # exp_type == 3
+            media_type = 'context'
+
+        # 자극 파일을 미리 선택하여 저장
+        st.session_state.current_stimulus_file = get_media_file(emotion, media_type)
+
         st.session_state.trial_start_time = time.time()
         st.session_state.stimulus_shown_time = time.time()
         st.session_state.show_stimulus = True
