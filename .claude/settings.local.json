@@ -4,7 +4,18 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git push)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(git fetch:*)",
+      "Bash(python:*)",
+      "Bash(pip install:*)",
+      "Bash(curl:*)",
+      "Bash(python3.13 -m pip install:*)",
+      "Bash(copy \"C:\\Users\\daena\\OneDrive\\one_drive\\OneDrive\\바탕 화면\\credentials.json\" \"c:\\Users\\daena\\emotion_experiment\\credentials.json\")",
+      "Bash(temp_file_ids.json)",
+      "Bash(git checkout:*)",
+      "Bash(git push:*)",
+      "Bash(dir:*)",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "ask": []

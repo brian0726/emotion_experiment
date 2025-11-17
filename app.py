@@ -748,8 +748,6 @@ def init_session_state():
         st.session_state.skip_enabled = False
     if 'show_stimulus' not in st.session_state:
         st.session_state.show_stimulus = True
-    if 'show_prompt' not in st.session_state:
-        st.session_state.show_prompt = False
     if 'stimulus_shown_time' not in st.session_state:
         st.session_state.stimulus_shown_time = None
     if 'current_stimulus_file' not in st.session_state:
@@ -1117,7 +1115,6 @@ def practice_intro_screen():
         st.session_state.trial_start_time = time.time()
         st.session_state.stimulus_shown_time = time.time()
         st.session_state.show_stimulus = True
-        st.session_state.show_prompt = False
         st.session_state.stage = 'experiment'
         st.rerun()
 
@@ -1216,8 +1213,8 @@ def experiment_screen():
 
             st.markdown('</div>', unsafe_allow_html=True)
 
-        # 자동 리프레시
-        time.sleep(0.5)
+        # 자동 리프레시 (더 빠른 업데이트를 위해 0.1초로 단축)
+        time.sleep(0.1)
         st.rerun()
 
     # 5초 후 자극 숨기기
@@ -1257,17 +1254,18 @@ def experiment_screen():
 
             st.markdown('</div>', unsafe_allow_html=True)
 
-    # 5초 후 "빠르게 응답해 주세요" 프롬프트 표시
-    if not st.session_state.show_stimulus and elapsed >= 10 and not st.session_state.show_prompt:
-        st.session_state.show_prompt = True
-
-    if st.session_state.show_prompt:
+    # 10초 후 "빠르게 응답해 주세요" 프롬프트 표시 (자극 5초 + 응답 5초 경과 시)
+    if not st.session_state.show_stimulus and elapsed >= 10:
         st.markdown('<div class="prompt-text">⚡ 빠르게 응답해 주세요</div>', unsafe_allow_html=True)
 
     # 15초 후 자동 넘어가기 (자극 5초 + 응답 10초)
     if elapsed >= 15:
         handle_choice(None, emotion, is_practice)
         return
+
+    # 지속적인 화면 갱신을 위한 리런 루프 (타이머 업데이트)
+    time.sleep(0.1)
+    st.rerun()
 
 # 선택 처리
 def handle_choice(selected_emotion, correct_emotion, is_practice):
@@ -1434,7 +1432,6 @@ def main_intro_screen():
         st.session_state.trial_start_time = time.time()
         st.session_state.stimulus_shown_time = time.time()
         st.session_state.show_stimulus = True
-        st.session_state.show_prompt = False
         st.session_state.stage = 'experiment'
         st.rerun()
 
