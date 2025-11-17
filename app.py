@@ -5,6 +5,9 @@ import random
 from datetime import datetime
 import os
 import asyncio
+import io
+import gspread
+from google.oauth2.service_account import Credentials
 from surveys import survey_mfi_screen, survey_phq9_screen, survey_tipi_screen
 
 # 페이지 설정
@@ -832,6 +835,177 @@ def save_response_data():
 
     return filename
 
+# 데이터 변환 및 점수 계산 함수
+def prepare_final_dataframe():
+    """
+    모든 데이터를 엑셀 양식에 맞게 변환하여 하나의 DataFrame 행으로 만듦
+    """
+    # 결과를 저장할 딕셔너리
+    result = {}
+
+    # A. 참가자 정보
+    participant_info = st.session_state.participant_info
+    result['이름'] = participant_info.get('name', '')
+    result['성별'] = participant_info.get('gender', '')
+    result['생년월일'] = participant_info.get('birthdate', '')
+    result['DRC코드'] = participant_info.get('drc_code', '')
+    result['학번'] = participant_info.get('student_id', '')
+    result['참가완료시간'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    # B. 설문 점수 계산
+    if 'survey_responses' in st.session_state:
+        survey_data = st.session_state.survey_responses
+
+        # MFI 점수 계산 (12문항)
+        mfi_items = []
+        for i in range(1, 13):
+            key = f'MFI_Q{i}'
+            if key in survey_data:
+                value = survey_data[key]
+                # 역문항 처리: 1, 3, 6, 7, 9번
+                if i in [1, 3, 6, 7, 9]:
+                    value = 6 - value
+                mfi_items.append(value)
+
+        if len(mfi_items) == 12:
+            # MFI 신체 총합 (1-6번)
+            result['MFI 신체_총합'] = sum(mfi_items[0:6])
+            # MFI 정신 총합 (7-12번)
+            result['MFI 정신_총합'] = sum(mfi_items[6:12])
+            # MFI 총합
+            result['MFI 총합'] = result['MFI 신체_총합'] + result['MFI 정신_총합']
+
+        # PHQ-9 점수 계산 (9문항 단순 합계)
+        phq9_total = 0
+        for i in range(1, 10):
+            key = f'PHQ9_Q{i}'
+            if key in survey_data:
+                phq9_total += survey_data[key]
+        result['PHQ-9 총합'] = phq9_total
+
+        # TIPI 점수 계산 (10문항)
+        tipi_items = []
+        for i in range(1, 11):
+            key = f'TIPI_Q{i}'
+            if key in survey_data:
+                value = survey_data[key]
+                # 역문항 처리: 2, 4, 6, 8, 10번
+                if i in [2, 4, 6, 8, 10]:
+                    value = 8 - value
+                tipi_items.append(value)
+
+        if len(tipi_items) == 10:
+            # 각 성격 특성 점수 계산 (원본과 역문항의 평균)
+            result['Extraversion 점수'] = (survey_data.get('TIPI_Q1', 0) + (8 - survey_data.get('TIPI_Q6', 0))) / 2
+            result['Agreeableness 점수'] = ((8 - survey_data.get('TIPI_Q2', 0)) + survey_data.get('TIPI_Q7', 0)) / 2
+            result['Conscientiousness 점수'] = (survey_data.get('TIPI_Q3', 0) + (8 - survey_data.get('TIPI_Q8', 0))) / 2
+            result['Emotional Stability 점수'] = ((8 - survey_data.get('TIPI_Q4', 0)) + survey_data.get('TIPI_Q9', 0)) / 2
+            result['Openness to Experience 점수'] = (survey_data.get('TIPI_Q5', 0) + (8 - survey_data.get('TIPI_Q10', 0))) / 2
+
+    # C. 실험 데이터 변환 (Wide Format)
+    if 'responses' in st.session_state:
+        # 연습 제외한 본 실험 응답만 필터링
+        main_responses = [r for r in st.session_state.responses if not r.get('is_practice', False)]
+
+        # 실험 유형별로 분류
+        exp1_responses = [r for r in main_responses if r['experiment_type'] == 1]
+        exp2_responses = [r for r in main_responses if r['experiment_type'] == 2]
+        exp3_responses = [r for r in main_responses if r['experiment_type'] == 3]
+
+        # 각 실험 유형별로 처리
+        for exp_type, responses in [(1, exp1_responses), (2, exp2_responses), (3, exp3_responses)]:
+            for idx, response in enumerate(responses, 1):
+                prefix = f"{exp_type}-{idx}"
+
+                # 제시자극파일명
+                result[f"{prefix} 제시자극파일명"] = response.get('stimulus_id', '')
+
+                # 제시자극정서명
+                result[f"{prefix} 제시자극정서명"] = response.get('correct_emotion', '')
+
+                # 선지정서명 (선택지 목록)
+                choices = response.get('choices', '')
+                if isinstance(choices, list):
+                    result[f"{prefix} 선지정서명"] = ', '.join(choices)
+                else:
+                    result[f"{prefix} 선지정서명"] = choices
+
+                # 참가자응답
+                result[f"{prefix} 참가자응답"] = response.get('selected_emotion', '')
+
+                # 정답여부 (1 또는 0)
+                result[f"{prefix} 정답여부"] = 1 if response.get('is_correct', False) else 0
+
+                # 반응시간(ms)
+                result[f"{prefix} 반응시간(ms)"] = response.get('reaction_time_ms', 0)
+
+                # 자극제시시점
+                stimulus_ts = response.get('stimulus_timestamp')
+                if stimulus_ts:
+                    result[f"{prefix} 자극제시시점"] = datetime.fromtimestamp(stimulus_ts / 1000).strftime('%Y-%m-%d-%H:%M:%S')
+                else:
+                    result[f"{prefix} 자극제시시점"] = ''
+
+                # 응답시점
+                response_ts = response.get('response_timestamp')
+                if response_ts:
+                    result[f"{prefix} 응답시점"] = datetime.fromtimestamp(response_ts / 1000).strftime('%Y-%m-%d-%H:%M:%S')
+                else:
+                    result[f"{prefix} 응답시점"] = ''
+
+    # DataFrame 생성 (한 행만)
+    df = pd.DataFrame([result])
+    return df
+
+# Google Sheets 업로드 함수
+def upload_to_gsheet(df):
+    """
+    DataFrame을 Google Sheets에 업로드
+    """
+    try:
+        # Streamlit secrets에서 서비스 계정 정보 가져오기
+        credentials = Credentials.from_service_account_info(
+            st.secrets["gcp_service_account"],
+            scopes=[
+                "https://www.googleapis.com/auth/spreadsheets",
+                "https://www.googleapis.com/auth/drive"
+            ]
+        )
+
+        # gspread 클라이언트 생성
+        gc = gspread.authorize(credentials)
+
+        # 스프레드시트 열기 (없으면 생성)
+        TARGET_SPREADSHEET_NAME = "감정인식실험_결과"
+
+        try:
+            sh = gc.open(TARGET_SPREADSHEET_NAME)
+        except gspread.exceptions.SpreadsheetNotFound:
+            # 스프레드시트가 없으면 생성
+            sh = gc.create(TARGET_SPREADSHEET_NAME)
+            # 첫 번째 워크시트 가져오기
+            worksheet = sh.get_worksheet(0)
+            # 헤더 추가
+            worksheet.append_row(df.columns.tolist())
+
+        # 워크시트 가져오기
+        worksheet = sh.get_worksheet(0)
+
+        # 첫 번째 행이 비어있으면 헤더 추가
+        if not worksheet.row_values(1):
+            worksheet.append_row(df.columns.tolist())
+
+        # 데이터 추가 (리스트로 변환)
+        row_data = df.values.tolist()[0]
+        # NaN 값을 빈 문자열로 변환
+        row_data = [str(val) if pd.notna(val) else '' for val in row_data]
+        worksheet.append_row(row_data)
+
+        return True, None
+
+    except Exception as e:
+        return False, str(e)
+
 # 1. 참가자 정보 입력 화면
 def participant_info_screen():
     st.title("감정 인식 실험")
@@ -1357,26 +1531,75 @@ def next_part_screen():
 def completion_screen():
     st.title("실험 완료")
 
-    st.markdown('<div class="instructions">실험이 완료되었습니다. 참여해 주셔서 감사합니다.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="instructions">실험이 완료되었습니다. 데이터를 처리 중입니다...</div>', unsafe_allow_html=True)
 
-    # 데이터 저장
-    filename = save_response_data()
+    # 데이터를 엑셀 양식에 맞게 변환
+    try:
+        final_df = prepare_final_dataframe()
+        st.success("✅ 데이터 변환 완료")
 
-    if filename:
-        st.success(f"결과가 성공적으로 저장되었습니다.")
+        # Google Sheets에 자동 저장 시도
+        if 'gcp_service_account' in st.secrets:
+            with st.spinner('Google Sheets에 데이터를 저장하는 중...'):
+                success, error_msg = upload_to_gsheet(final_df)
 
-        # CSV 다운로드 버튼
-        try:
-            with open(filename, 'rb') as f:
-                st.download_button(
-                    label="📥 데이터 다운로드",
-                    data=f,
-                    file_name=os.path.basename(filename),
-                    mime='text/csv',
-                    use_container_width=True
-                )
-        except:
-            pass
+            if success:
+                st.success("✅ Google Sheets에 자동 저장 완료!")
+            else:
+                st.error(f"⚠️ Google Sheets 저장 실패: {error_msg}")
+                st.info("아래에서 수동으로 다운로드할 수 있습니다.")
+        else:
+            st.warning("⚠️ Google Sheets 연동 설정이 없어 수동 다운로드만 가능합니다.")
+
+        st.markdown("---")
+
+        # 엑셀 파일로 다운로드 버튼
+        col1, col2 = st.columns(2)
+
+        with col1:
+            # 엑셀 파일 생성
+            excel_buffer = io.BytesIO()
+            with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
+                final_df.to_excel(writer, sheet_name='실험결과', index=False)
+
+            excel_buffer.seek(0)
+
+            # 다운로드 버튼
+            student_id = st.session_state.participant_info.get('student_id', 'unknown')
+            excel_filename = f"결과_{student_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+
+            st.download_button(
+                label="📥 엑셀 파일 다운로드",
+                data=excel_buffer,
+                file_name=excel_filename,
+                mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                use_container_width=True
+            )
+
+        with col2:
+            # 기존 CSV 다운로드도 유지
+            filename = save_response_data()
+            if filename:
+                try:
+                    with open(filename, 'rb') as f:
+                        st.download_button(
+                            label="📄 CSV 파일 다운로드 (원본)",
+                            data=f,
+                            file_name=os.path.basename(filename),
+                            mime='text/csv',
+                            use_container_width=True
+                        )
+                except:
+                    pass
+
+    except Exception as e:
+        st.error(f"데이터 처리 중 오류가 발생했습니다: {str(e)}")
+        st.info("관리자에게 문의해 주세요.")
+
+        # 에러가 나도 기본 CSV는 저장
+        filename = save_response_data()
+        if filename:
+            st.success(f"기본 데이터는 저장되었습니다: {filename}")
 
     st.markdown("---")
 
