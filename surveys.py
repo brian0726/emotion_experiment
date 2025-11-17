@@ -65,15 +65,6 @@ def survey_mfi_screen():
     """, unsafe_allow_html=True)
 
     with st.form("mfi_form"):
-        # 라디오 버튼 간격 CSS
-        st.markdown("""
-        <style>
-        [data-testid="stForm"] [role="radiogroup"] label {
-            margin-right: 120px !important;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-
         responses = {}
 
         for i, question in enumerate(MFI_QUESTIONS, 1):
@@ -93,14 +84,14 @@ def survey_mfi_screen():
                 label_visibility="collapsed"
             )
 
-            # 척도 레이블 (버튼 아래)
+            # 척도 레이블 (버튼 아래) - 5개 옵션에 맞춰 20%씩 배치
             st.markdown("""
-            <div style="display: flex; justify-content: flex-start; gap: 110px; margin-left: 5px; font-size: 11px; color: #666;">
-                <span style="text-align: center; white-space: nowrap;">전혀 그렇지 않다</span>
-                <span style="text-align: center; white-space: nowrap;"></span>
-                <span style="text-align: center; white-space: nowrap;">보통이다</span>
-                <span style="text-align: center; white-space: nowrap;"></span>
-                <span style="text-align: center; white-space: nowrap;">매우 그렇다</span>
+            <div style="display: flex; width: 100%; margin-top: 5px;">
+                <div style="width: 20%; text-align: center; font-size: 11px; color: #666;">전혀 그렇지 않다</div>
+                <div style="width: 20%; text-align: center; font-size: 11px; color: #666;"></div>
+                <div style="width: 20%; text-align: center; font-size: 11px; color: #666;">보통이다</div>
+                <div style="width: 20%; text-align: center; font-size: 11px; color: #666;"></div>
+                <div style="width: 20%; text-align: center; font-size: 11px; color: #666;">매우 그렇다</div>
             </div>
             """, unsafe_allow_html=True)
 
@@ -143,15 +134,6 @@ def survey_phq9_screen():
     """, unsafe_allow_html=True)
 
     with st.form("phq9_form"):
-        # 라디오 버튼 간격 CSS
-        st.markdown("""
-        <style>
-        [data-testid="stForm"] [role="radiogroup"] label {
-            margin-right: 120px !important;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-
         responses = {}
 
         for i, question in enumerate(PHQ9_QUESTIONS, 1):
@@ -171,13 +153,13 @@ def survey_phq9_screen():
                 label_visibility="collapsed"
             )
 
-            # 척도 레이블 (버튼 아래)
+            # 척도 레이블 (버튼 아래) - 4개 옵션에 맞춰 25%씩 배치
             st.markdown("""
-            <div style="display: flex; justify-content: flex-start; gap: 93px; margin-left: 5px; font-size: 11px; color: #666;">
-                <span style="text-align: center; white-space: nowrap;">전혀 아님</span>
-                <span style="text-align: center; white-space: nowrap;">2~3일 이상</span>
-                <span style="text-align: center; white-space: nowrap;">7일 이상</span>
-                <span style="text-align: center; white-space: nowrap;">거의 매일</span>
+            <div style="display: flex; width: 100%; margin-top: 5px;">
+                <div style="width: 25%; text-align: center; font-size: 11px; color: #666;">전혀 아님</div>
+                <div style="width: 25%; text-align: center; font-size: 11px; color: #666;">2~3일 이상</div>
+                <div style="width: 25%; text-align: center; font-size: 11px; color: #666;">7일 이상</div>
+                <div style="width: 25%; text-align: center; font-size: 11px; color: #666;">거의 매일</div>
             </div>
             """, unsafe_allow_html=True)
 

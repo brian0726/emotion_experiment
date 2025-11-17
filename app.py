@@ -852,15 +852,8 @@ def instruction_screen():
 def practice_intro_screen():
     st.title("연습 시행")
 
-    exp_type = st.session_state.experiment_type
-
-    instructions_text = {
-        1: "다음의 예시를 통해 연습을 해 봅시다. 다음 화면을 주의 깊게 보고, 얼굴 표정에 가장 적합한 감정 단어를 선택해 주세요.",
-        2: "다음의 예시를 통해 연습을 해 봅시다. 다음 화면을 주의 깊게 보고, 얼굴 표정에 가장 적합한 감정 단어를 선택해 주세요.",
-        3: "다음의 예시를 통해 연습을 해 봅시다. 다음 화면을 주의 깊게 보고, 얼굴 표정에 가장 적합한 감정 단어를 선택해 주세요."
-    }
-
-    st.markdown(f'<div class="instructions">{instructions_text[exp_type]}</div>', unsafe_allow_html=True)
+    # 표준 연습 안내 문구
+    st.markdown('<div class="instructions">다음의 예시를 통해 연습을 해 봅시다. 다음 화면을 주의 깊게 관찰하고, 얼굴 표정에 가장 적합한 감정 단어를 선택해 주세요.</div>', unsafe_allow_html=True)
 
     if st.button("연습 시작", use_container_width=True):
         # 연습용 감정 선택
@@ -907,15 +900,9 @@ def experiment_screen():
         remaining = max(0, 15 - elapsed)
         st.markdown(f'<div class="timer">남은 시간: {remaining}초</div>', unsafe_allow_html=True)
 
-    # 안내문
-    instruction_texts = {
-        1: "다음 화면을 주의 깊게 보고, 얼굴 표정에 가장 적합한 감정 단어를 선택해 주세요.",
-        2: "다음 화면을 주의 깊게 보고, 얼굴 표정에 가장 적합한 감정 단어를 선택해 주세요.",
-        3: "다음 화면을 주의 깊게 보고, 얼굴 표정에 가장 적합한 감정 단어를 선택해 주세요."
-    }
-
+    # 안내문 (모든 실험 타입에 동일한 표준 문구)
     if not is_practice:
-        st.markdown(f'<div class="instructions">{instruction_texts[exp_type]}</div>', unsafe_allow_html=True)
+        st.markdown('<div class="instructions">다음 화면을 주의 깊게 관찰하고, 얼굴 표정에 가장 적합한 감정 단어를 선택해 주세요.</div>', unsafe_allow_html=True)
 
     # 자극 제시 (5초간)
     if st.session_state.show_stimulus and stimulus_elapsed < 5:
@@ -1002,10 +989,8 @@ def experiment_screen():
         handle_choice(None, emotion, is_practice)
         return
 
-    # 선택지 표시 (자극이 사라진 후)
+    # 선택지 표시 (자극이 사라진 후에만)
     if not st.session_state.show_stimulus:
-        st.markdown("")  # 빈 공간만 유지
-
         # 선택지를 3-3-1 형태로 배치 (총 7개)
         cols1 = st.columns(3)
         for i in range(3):
@@ -1145,28 +1130,34 @@ def main_intro_screen():
 
 # 실험 유형 간 30초 휴식 화면
 def rest_between_exp_screen():
+    # 화면 클리어를 위한 컨테이너
+    st.empty()
+
     st.title("휴식 시간")
-    
+
     exp_type = st.session_state.experiment_type
-    
+
     if exp_type == 2:
         msg = "첫 번째 실험이 완료되었습니다.\n\n30초간 휴식 후 두 번째 실험이 시작됩니다."
     else:
         msg = "두 번째 실험이 완료되었습니다.\n\n30초간 휴식 후 마지막 실험이 시작됩니다."
-    
+
     st.markdown(f'<div class="instructions" style="white-space: pre-line;">{msg}</div>', unsafe_allow_html=True)
-    
+
     # 타이머
     timer_placeholder = st.empty()
-    
+
     for remaining in range(30, 0, -1):
         timer_placeholder.markdown(f'<div class="timer" style="font-size: 48px;">{remaining}</div>', unsafe_allow_html=True)
         time.sleep(1)
-    
+
     # 휴식 후 다음 파트 안내로
     st.session_state.stage = 'next_part'
     st.rerun()
 def rest_screen():
+    # 화면 클리어를 위한 컨테이너
+    st.empty()
+
     st.title("휴식 시간")
 
     st.markdown('<div class="instructions">휴식 시간입니다. 30초간 휴식 후 다시 과제가 시작될 예정입니다.</div>', unsafe_allow_html=True)
@@ -1204,11 +1195,11 @@ def next_part_screen():
         2: """첫 번째 실험이 완료되었습니다.
 
 이제 두 번째 실험을 시작합니다.
-동영상을 주의 깊게 관찰하고 감정을 선택해 주세요.""",
+다음 화면을 주의 깊게 관찰하고, 얼굴 표정에 가장 적합한 감정 단어를 선택해 주세요.""",
         3: """두 번째 실험이 완료되었습니다.
 
 이제 마지막 실험을 시작합니다.
-동영상을 주의 깊게 관찰하고 감정을 선택해 주세요."""
+다음 화면을 주의 깊게 관찰하고, 얼굴 표정에 가장 적합한 감정 단어를 선택해 주세요."""
     }
 
     st.title(titles[exp_type])
