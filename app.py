@@ -18,15 +18,41 @@ st.set_page_config(
 # CSS 스타일
 st.markdown("""
 <style>
+    /* 메인 컨테이너의 상단 패딩 줄이기 */
+    .block-container {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+
+    /* 페이지 상단 여백 제거 */
+    .main .block-container > div:first-child {
+        margin-top: -2rem !important;
+    }
+
+    /* Streamlit 헤더 여백 조정 */
+    .stApp > header {
+        height: 2rem !important;
+    }
+
     .main {
         background-color: #f5f5f5;
     }
+
+    /* 제목 스타일 및 여백 조정 */
+    h1 {
+        color: #333;
+        text-align: center;
+        margin-top: 0 !important;
+        margin-bottom: 0.5rem !important;
+        padding-top: 0 !important;
+    }
+
     .stButton>button {
         width: 100%;
         background-color: #2196f3;
         color: white;
         border-radius: 8px;
-        padding: 15px;
+        padding: 12px;
         font-size: 18px;
         border: none;
         transition: all 0.3s ease;
@@ -44,60 +70,87 @@ st.markdown("""
         background: white;
         cursor: pointer;
     }
-    h1 {
-        color: #333;
-        text-align: center;
-    }
+
+    /* 안내문 여백 축소 */
     .instructions {
-        font-size: 18px;
-        line-height: 1.6;
+        font-size: 16px;
+        line-height: 1.4;
         color: #555;
         background: white;
-        padding: 20px;
+        padding: 12px 16px;
         border-radius: 10px;
-        margin: 20px 0;
+        margin: 8px 0;
     }
+
+    /* 타이머 여백 축소 */
     .timer {
-        font-size: 24px;
+        font-size: 22px;
         font-weight: bold;
         color: #2196f3;
         text-align: center;
-        padding: 10px;
+        padding: 8px;
         background: white;
         border-radius: 8px;
-        margin: 10px 0;
+        margin: 5px 0;
     }
+
     .prompt-text {
         color: #f44336;
-        font-size: 20px;
+        font-size: 18px;
         font-weight: bold;
         text-align: center;
-        margin: 20px 0;
+        margin: 10px 0;
         animation: pulse 1s infinite;
     }
     @keyframes pulse {
         0%, 100% { opacity: 1; }
         50% { opacity: 0.7; }
     }
+
+    /* 진행률 텍스트 여백 축소 */
     .progress-text {
         text-align: center;
-        font-size: 16px;
+        font-size: 14px;
         color: #666;
-        margin: 10px 0;
+        margin: 5px 0;
     }
+
     .question-container {
         background: white;
-        padding: 15px;
+        padding: 12px;
         border-radius: 8px;
-        margin: 15px 0;
+        margin: 10px 0;
         border-left: 4px solid #2196f3;
     }
+
+    /* 자극 컨테이너 높이 및 여백 조정 */
     .stimulus-container {
         display: flex;
         justify-content: center;
         align-items: center;
-        min-height: 400px;
-        margin: 20px 0;
+        min-height: 320px;
+        margin: 10px 0;
+    }
+
+    /* Progress bar 여백 조정 */
+    .stProgress > div {
+        margin-bottom: 0.5rem !important;
+    }
+
+    /* 버튼 그룹 간격 조정 */
+    .row-widget.stButton {
+        margin-bottom: 0.25rem !important;
+    }
+
+    /* 전체 요소 간 간격 축소 */
+    .element-container {
+        margin-bottom: 0.5rem !important;
+    }
+
+    /* 캡션 스타일 (디버그용) */
+    .stCaption {
+        font-size: 10px !important;
+        margin: 2px 0 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -703,6 +756,12 @@ def init_session_state():
         st.session_state.stimulus_shown_time = None
     if 'current_stimulus_file' not in st.session_state:
         st.session_state.current_stimulus_file = None
+    if 'current_stimulus_id' not in st.session_state:
+        st.session_state.current_stimulus_id = None
+    if 'current_choices_list' not in st.session_state:
+        st.session_state.current_choices_list = []
+    if 'stimulus_timestamp' not in st.session_state:
+        st.session_state.stimulus_timestamp = None
 
 # 선택지 생성 (정답 1개 + 랜덤 6개) - 총 7개
 def generate_choices(correct_emotion):
@@ -873,7 +932,17 @@ def practice_intro_screen():
             media_type = 'context'
 
         # 자극 파일을 미리 선택하여 저장
-        st.session_state.current_stimulus_file = get_media_file(practice_emotion, media_type)
+        stimulus_file = get_media_file(practice_emotion, media_type)
+        st.session_state.current_stimulus_file = stimulus_file
+
+        # 메타데이터 저장
+        if stimulus_file:
+            st.session_state.current_stimulus_id = stimulus_file.get('id', None)
+        else:
+            st.session_state.current_stimulus_id = None
+
+        st.session_state.current_choices_list = st.session_state.current_choices
+        st.session_state.stimulus_timestamp = int(time.time() * 1000)  # 밀리초 단위
 
         st.session_state.is_practice = True
         st.session_state.trial_start_time = time.time()
@@ -918,61 +987,65 @@ def experiment_screen():
     if not is_practice:
         st.markdown('<div class="instructions">다음 화면을 주의 깊게 관찰하고, 얼굴 표정에 가장 적합한 감정 단어를 선택해 주세요.</div>', unsafe_allow_html=True)
 
+    # 자극과 선택지를 동일한 위치에서 교체하기 위한 단일 컨테이너
+    interaction_placeholder = st.empty()
+
     # 자극 제시 (5초간)
     if st.session_state.show_stimulus and stimulus_elapsed < 5:
-        # 저장된 자극 파일 가져오기 (더 이상 새로 선택하지 않음)
-        file_info = st.session_state.current_stimulus_file
+        with interaction_placeholder.container():
+            # 저장된 자극 파일 가져오기 (더 이상 새로 선택하지 않음)
+            file_info = st.session_state.current_stimulus_file
 
-        st.markdown('<div class="stimulus-container">', unsafe_allow_html=True)
+            st.markdown('<div class="stimulus-container">', unsafe_allow_html=True)
 
-        if file_info and 'url' in file_info:
-            # 실제 미디어 표시
-            mime_type = file_info.get('mimeType', '')
-            file_url = file_info['url']
+            if file_info and 'url' in file_info:
+                # 실제 미디어 표시
+                mime_type = file_info.get('mimeType', '')
+                file_url = file_info['url']
 
-            # 디버그: 파일 ID와 URL 표시 (개발 중에만)
-            if st.session_state.skip_enabled:  # 테스트 계정일 때만 표시
-                st.caption(f"파일 ID: {file_info.get('id', 'Unknown')}")
-                st.caption(f"URL: {file_url}")
+                # 디버그: 파일 ID와 URL 표시 (개발 중에만)
+                if st.session_state.skip_enabled:  # 테스트 계정일 때만 표시
+                    st.caption(f"파일 ID: {file_info.get('id', 'Unknown')}")
+                    st.caption(f"URL: {file_url}")
 
-            if mime_type.startswith('image/'):
-                # 이미지 표시 (여러 URL 형식 시도)
-                alt_urls = file_info.get('alt_urls', [])
-                onerror_chain = ""
-                for i, alt_url in enumerate(alt_urls):
-                    if i == len(alt_urls) - 1:
-                        # 마지막 대체 URL - 실패 시 placeholder 표시
-                        onerror_chain += f"this.onerror=function(){{this.src='https://via.placeholder.com/480x480?text=Image+Load+Failed';}}; this.src='{alt_url}';"
-                    else:
-                        # 중간 대체 URL들
-                        onerror_chain += f"this.src='{alt_url}';"
+                if mime_type.startswith('image/'):
+                    # 이미지 표시 (여러 URL 형식 시도)
+                    alt_urls = file_info.get('alt_urls', [])
+                    onerror_chain = ""
+                    for i, alt_url in enumerate(alt_urls):
+                        if i == len(alt_urls) - 1:
+                            # 마지막 대체 URL - 실패 시 placeholder 표시
+                            onerror_chain += f"this.onerror=function(){{this.src='https://via.placeholder.com/480x480?text=Image+Load+Failed';}}; this.src='{alt_url}';"
+                        else:
+                            # 중간 대체 URL들
+                            onerror_chain += f"this.src='{alt_url}';"
 
-                st.markdown(f'''
-                    <div style="text-align: center;">
-                        <img src="{file_url}" style="max-width: 100%; height: auto; max-height: 480px;"
-                             onerror="{onerror_chain}">
-                    </div>
-                ''', unsafe_allow_html=True)
-            elif mime_type.startswith('video/'):
-                # 동영상 표시 (iframe 사용)
-                st.markdown(f'''
-                    <iframe src="{file_url}"
-                            width="100%"
-                            height="480"
-                            frameborder="0"
-                            allow="autoplay; encrypted-media"
-                            allowfullscreen>
-                    </iframe>
-                ''', unsafe_allow_html=True)
+                    st.markdown(f'''
+                        <div style="text-align: center;">
+                            <img src="{file_url}" style="max-width: 100%; height: auto; max-height: 480px;"
+                                 onerror="{onerror_chain}">
+                        </div>
+                    ''', unsafe_allow_html=True)
+                elif mime_type.startswith('video/'):
+                    # 동영상 표시 (iframe 사용)
+                    st.markdown(f'''
+                        <iframe src="{file_url}"
+                                width="100%"
+                                height="480"
+                                frameborder="0"
+                                allow="autoplay; encrypted-media"
+                                allowfullscreen>
+                        </iframe>
+                    ''', unsafe_allow_html=True)
+                else:
+                    # 기타 파일 타입
+                    st.markdown(f'<iframe src="{file_url}" width="100%" height="600" frameborder="0"></iframe>',
+                               unsafe_allow_html=True)
             else:
-                # 기타 파일 타입
-                st.markdown(f'<iframe src="{file_url}" width="100%" height="600" frameborder="0"></iframe>',
-                           unsafe_allow_html=True)
-        else:
-            st.warning(f"미디어를 찾을 수 없습니다: {emotion}")
-            st.info("Google Drive API 키가 설정되지 않았거나, 폴더에 파일이 없을 수 있습니다.")
+                st.warning(f"미디어를 찾을 수 없습니다: {emotion}")
+                st.info("Google Drive API 키가 설정되지 않았거나, 폴더에 파일이 없을 수 있습니다.")
 
-        st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
 
         # 자동 리프레시
         time.sleep(0.5)
@@ -982,6 +1055,38 @@ def experiment_screen():
     elif st.session_state.show_stimulus and stimulus_elapsed >= 5:
         st.session_state.show_stimulus = False
         st.rerun()
+
+    # 선택지 표시 (자극이 사라진 후에만, 동일한 위치에)
+    elif not st.session_state.show_stimulus:
+        with interaction_placeholder.container():
+            # stimulus-container와 동일한 높이 유지를 위한 컨테이너
+            st.markdown('<div class="stimulus-container">', unsafe_allow_html=True)
+
+            # 선택지를 3-3-1 형태로 배치 (총 7개)
+            cols1 = st.columns(3)
+            for i in range(3):
+                with cols1[i]:
+                    if st.button(choices[i], key=f"choice_{i}", use_container_width=True):
+                        handle_choice(choices[i], emotion, is_practice)
+
+            cols2 = st.columns(3)
+            for i in range(3, 6):
+                with cols2[i-3]:
+                    if st.button(choices[i], key=f"choice_{i}", use_container_width=True):
+                        handle_choice(choices[i], emotion, is_practice)
+
+            cols3 = st.columns([1, 1, 1])
+            with cols3[1]:
+                if st.button(choices[6], key=f"choice_6", use_container_width=True):
+                    handle_choice(choices[6], emotion, is_practice)
+
+            # 스킵 버튼 (특정 학번만, 본 실험에서만)
+            if st.session_state.skip_enabled and not is_practice:
+                st.markdown("---")
+                if st.button("⏭️ 스킵", use_container_width=True):
+                    handle_skip(emotion)
+
+            st.markdown('</div>', unsafe_allow_html=True)
 
     # 5초 후 "빠르게 응답해 주세요" 프롬프트 표시
     if not st.session_state.show_stimulus and elapsed >= 10 and not st.session_state.show_prompt:
@@ -995,45 +1100,25 @@ def experiment_screen():
         handle_choice(None, emotion, is_practice)
         return
 
-    # 선택지 표시 (자극이 사라진 후에만)
-    if not st.session_state.show_stimulus:
-        # 선택지를 3-3-1 형태로 배치 (총 7개)
-        cols1 = st.columns(3)
-        for i in range(3):
-            with cols1[i]:
-                if st.button(choices[i], key=f"choice_{i}", use_container_width=True):
-                    handle_choice(choices[i], emotion, is_practice)
-
-        cols2 = st.columns(3)
-        for i in range(3, 6):
-            with cols2[i-3]:
-                if st.button(choices[i], key=f"choice_{i}", use_container_width=True):
-                    handle_choice(choices[i], emotion, is_practice)
-
-        cols3 = st.columns([1, 1, 1])
-        with cols3[1]:
-            if st.button(choices[6], key=f"choice_6", use_container_width=True):
-                handle_choice(choices[6], emotion, is_practice)
-
-        # 스킵 버튼 (특정 학번만, 본 실험에서만)
-        if st.session_state.skip_enabled and not is_practice:
-            st.markdown("---")
-            if st.button("⏭️ 스킵", use_container_width=True):
-                handle_skip(emotion)
-
 # 선택 처리
 def handle_choice(selected_emotion, correct_emotion, is_practice):
     reaction_time = time.time() - st.session_state.trial_start_time
     is_correct = (selected_emotion == correct_emotion) if selected_emotion else False
+    response_timestamp = int(time.time() * 1000)  # 현재 시간 (밀리초)
 
     # 응답 기록
     response_data = {
         'trial_number': st.session_state.current_trial + 1,
         'experiment_type': st.session_state.experiment_type,
+        'stimulus_id': st.session_state.current_stimulus_id,
         'correct_emotion': correct_emotion,
+        'choices': ', '.join(st.session_state.current_choices_list) if st.session_state.current_choices_list else '',
         'selected_emotion': selected_emotion if selected_emotion else 'no_response',
         'is_correct': is_correct,
         'reaction_time': reaction_time,
+        'reaction_time_ms': int(reaction_time * 1000),  # 밀리초 단위 반응 시간
+        'stimulus_timestamp': st.session_state.stimulus_timestamp,
+        'response_timestamp': response_timestamp,
         'is_practice': is_practice
     }
 
@@ -1055,14 +1140,20 @@ def handle_choice(selected_emotion, correct_emotion, is_practice):
 # 스킵 처리
 def handle_skip(correct_emotion):
     reaction_time = time.time() - st.session_state.trial_start_time
+    response_timestamp = int(time.time() * 1000)  # 현재 시간 (밀리초)
 
     response_data = {
         'trial_number': st.session_state.current_trial + 1,
         'experiment_type': st.session_state.experiment_type,
+        'stimulus_id': st.session_state.current_stimulus_id,
         'correct_emotion': correct_emotion,
+        'choices': ', '.join(st.session_state.current_choices_list) if st.session_state.current_choices_list else '',
         'selected_emotion': 'skipped',
         'is_correct': False,
         'reaction_time': reaction_time,
+        'reaction_time_ms': int(reaction_time * 1000),  # 밀리초 단위 반응 시간
+        'stimulus_timestamp': st.session_state.stimulus_timestamp,
+        'response_timestamp': response_timestamp,
         'is_practice': False
     }
 
@@ -1090,7 +1181,17 @@ def next_trial():
         media_type = 'context'
 
     # 자극 파일을 미리 선택하여 저장
-    st.session_state.current_stimulus_file = get_media_file(emotion, media_type)
+    stimulus_file = get_media_file(emotion, media_type)
+    st.session_state.current_stimulus_file = stimulus_file
+
+    # 메타데이터 저장
+    if stimulus_file:
+        st.session_state.current_stimulus_id = stimulus_file.get('id', None)
+    else:
+        st.session_state.current_stimulus_id = None
+
+    st.session_state.current_choices_list = st.session_state.current_choices
+    st.session_state.stimulus_timestamp = int(time.time() * 1000)  # 밀리초 단위
 
     st.session_state.trial_start_time = time.time()
     st.session_state.stimulus_shown_time = time.time()
@@ -1149,7 +1250,17 @@ def main_intro_screen():
             media_type = 'context'
 
         # 자극 파일을 미리 선택하여 저장
-        st.session_state.current_stimulus_file = get_media_file(emotion, media_type)
+        stimulus_file = get_media_file(emotion, media_type)
+        st.session_state.current_stimulus_file = stimulus_file
+
+        # 메타데이터 저장
+        if stimulus_file:
+            st.session_state.current_stimulus_id = stimulus_file.get('id', None)
+        else:
+            st.session_state.current_stimulus_id = None
+
+        st.session_state.current_choices_list = st.session_state.current_choices
+        st.session_state.stimulus_timestamp = int(time.time() * 1000)  # 밀리초 단위
 
         st.session_state.trial_start_time = time.time()
         st.session_state.stimulus_shown_time = time.time()
