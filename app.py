@@ -21,15 +21,10 @@ st.set_page_config(
 # CSS 스타일
 st.markdown("""
 <style>
-    /* 메인 컨테이너의 상단 패딩 줄이기 */
+    /* 메인 컨테이너의 상단 패딩 - 충분한 여백 확보 */
     .block-container {
-        padding-top: 1rem !important;
+        padding-top: 2rem !important;
         padding-bottom: 1rem !important;
-    }
-
-    /* 페이지 상단 여백 제거 */
-    .main .block-container > div:first-child {
-        margin-top: -2rem !important;
     }
 
     /* Streamlit 헤더 여백 조정 */
