@@ -57,6 +57,41 @@ TIPI_QUESTIONS = [
 def survey_mfi_screen():
     st.title("😴 피로도 설문 (MFI)")
 
+    # 라디오 버튼 정렬을 위한 CSS (5개 옵션 = 각 20%)
+    st.markdown("""
+    <style>
+    /* MFI 설문용 라디오 버튼 정렬 */
+    div[data-testid="stRadio"] > div[role="radiogroup"] {
+        display: flex !important;
+        width: 100% !important;
+        justify-content: flex-start !important;
+    }
+
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label {
+        flex: 0 0 20% !important;
+        width: 20% !important;
+        max-width: 20% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+
+    /* 라디오 버튼 input을 컨테이너 내에서 중앙 정렬 */
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label > div {
+        display: flex !important;
+        justify-content: center !important;
+        width: 100% !important;
+    }
+
+    /* 라디오 버튼 텍스트 중앙 정렬 */
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label > div:last-child {
+        text-align: center !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
     st.markdown("""
     <div class="instructions">
     <strong>Multidimensional Fatigue Inventory (다차원 피로 척도)</strong><br><br>
@@ -84,28 +119,13 @@ def survey_mfi_screen():
                 label_visibility="collapsed"
             )
 
-            # 척도 레이블 - MFI: 실제 버튼 위치에 맞춤 조정
-            # Streamlit 라디오 버튼은 약간의 좌측 패딩이 있음
-            st.markdown("""
-                <style>
-                    .mfi-labels {
-                        display: flex;
-                        width: calc(100% - 1rem);
-                        margin-left: 0.5rem;
-                        margin-top: -8px;
-                    }
-                    .mfi-labels > div {
-                        flex: 1;
-                        font-size: 11px;
-                        color: #666;
-                    }
-                </style>
-                <div class='mfi-labels'>
-                    <div style='text-align: left;'>전혀 그렇지 않다</div>
-                    <div style='text-align: center; margin-left: -40px;'>보통이다</div>
-                    <div style='text-align: right;'>매우 그렇다</div>
-                </div>
-            """, unsafe_allow_html=True)
+            # 척도 레이블 - 컬럼 사용하여 정확한 20% 위치에 배치
+            label_cols = st.columns(5)
+            label_cols[0].markdown("<div style='text-align: center; font-size: 11px; color: #666;'>전혀 그렇지 않다</div>", unsafe_allow_html=True)
+            label_cols[1].markdown("<div style='text-align: center; font-size: 11px; color: #666;'></div>", unsafe_allow_html=True)
+            label_cols[2].markdown("<div style='text-align: center; font-size: 11px; color: #666;'>보통이다</div>", unsafe_allow_html=True)
+            label_cols[3].markdown("<div style='text-align: center; font-size: 11px; color: #666;'></div>", unsafe_allow_html=True)
+            label_cols[4].markdown("<div style='text-align: center; font-size: 11px; color: #666;'>매우 그렇다</div>", unsafe_allow_html=True)
 
             st.markdown("<br>", unsafe_allow_html=True)
 
@@ -138,6 +158,41 @@ def survey_mfi_screen():
 def survey_phq9_screen():
     st.title("💙 우울 설문 (PHQ-9)")
 
+    # 라디오 버튼 정렬을 위한 CSS (4개 옵션 = 각 25%)
+    st.markdown("""
+    <style>
+    /* PHQ-9 설문용 라디오 버튼 정렬 */
+    div[data-testid="stRadio"] > div[role="radiogroup"] {
+        display: flex !important;
+        width: 100% !important;
+        justify-content: flex-start !important;
+    }
+
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label {
+        flex: 0 0 25% !important;
+        width: 25% !important;
+        max-width: 25% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+
+    /* 라디오 버튼 input을 컨테이너 내에서 중앙 정렬 */
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label > div {
+        display: flex !important;
+        justify-content: center !important;
+        width: 100% !important;
+    }
+
+    /* 라디오 버튼 텍스트 중앙 정렬 */
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label > div:last-child {
+        text-align: center !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
     st.markdown("""
     <div class="instructions">
     <strong>Patient Health Questionnaire-9 (환자 건강 질문지)</strong><br><br>
@@ -165,29 +220,12 @@ def survey_phq9_screen():
                 label_visibility="collapsed"
             )
 
-            # 척도 레이블 - PHQ-9: 실제 버튼 위치에 맞춤 조정
-            st.markdown("""
-                <style>
-                    .phq-labels {
-                        display: flex;
-                        width: calc(100% - 1rem);
-                        margin-left: 0.5rem;
-                        margin-top: -8px;
-                    }
-                    .phq-labels > div {
-                        width: 25%;
-                        text-align: center;
-                        font-size: 11px;
-                        color: #666;
-                    }
-                </style>
-                <div class='phq-labels'>
-                    <div>전혀 아님</div>
-                    <div>2~3일 이상</div>
-                    <div>7일 이상</div>
-                    <div>거의 매일</div>
-                </div>
-            """, unsafe_allow_html=True)
+            # 척도 레이블 - 컬럼 사용하여 정확한 25% 위치에 배치
+            label_cols = st.columns(4)
+            label_cols[0].markdown("<div style='text-align: center; font-size: 11px; color: #666;'>전혀 아님</div>", unsafe_allow_html=True)
+            label_cols[1].markdown("<div style='text-align: center; font-size: 11px; color: #666;'>2~3일 이상</div>", unsafe_allow_html=True)
+            label_cols[2].markdown("<div style='text-align: center; font-size: 11px; color: #666;'>7일 이상</div>", unsafe_allow_html=True)
+            label_cols[3].markdown("<div style='text-align: center; font-size: 11px; color: #666;'>거의 매일</div>", unsafe_allow_html=True)
 
             st.markdown("<br>", unsafe_allow_html=True)
 
