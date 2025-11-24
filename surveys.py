@@ -57,41 +57,6 @@ TIPI_QUESTIONS = [
 def survey_mfi_screen():
     st.title("😴 피로도 설문 (MFI)")
 
-    # 라디오 버튼 정렬을 위한 CSS (5개 옵션 = 각 20%)
-    st.markdown("""
-    <style>
-    /* MFI 설문용 라디오 버튼 정렬 */
-    div[data-testid="stRadio"] > div[role="radiogroup"] {
-        display: flex !important;
-        width: 100% !important;
-        justify-content: flex-start !important;
-    }
-
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label {
-        flex: 0 0 20% !important;
-        width: 20% !important;
-        max-width: 20% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-    }
-
-    /* 라디오 버튼 input을 컨테이너 내에서 중앙 정렬 */
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label > div {
-        display: flex !important;
-        justify-content: center !important;
-        width: 100% !important;
-    }
-
-    /* 라디오 버튼 텍스트 중앙 정렬 */
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label > div:last-child {
-        text-align: center !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
     st.markdown("""
     <div class="instructions">
     <strong>Multidimensional Fatigue Inventory (다차원 피로 척도)</strong><br><br>
@@ -157,41 +122,6 @@ def survey_mfi_screen():
 # 2. PHQ-9 우울 설문 화면
 def survey_phq9_screen():
     st.title("💙 우울 설문 (PHQ-9)")
-
-    # 라디오 버튼 정렬을 위한 CSS (4개 옵션 = 각 25%)
-    st.markdown("""
-    <style>
-    /* PHQ-9 설문용 라디오 버튼 정렬 */
-    div[data-testid="stRadio"] > div[role="radiogroup"] {
-        display: flex !important;
-        width: 100% !important;
-        justify-content: flex-start !important;
-    }
-
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label {
-        flex: 0 0 25% !important;
-        width: 25% !important;
-        max-width: 25% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-    }
-
-    /* 라디오 버튼 input을 컨테이너 내에서 중앙 정렬 */
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label > div {
-        display: flex !important;
-        justify-content: center !important;
-        width: 100% !important;
-    }
-
-    /* 라디오 버튼 텍스트 중앙 정렬 */
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label > div:last-child {
-        text-align: center !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
 
     st.markdown("""
     <div class="instructions">
