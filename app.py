@@ -71,25 +71,25 @@ st.markdown("""
 
     /* 안내문 여백 축소 */
     .instructions {
-        font-size: 16px;
-        line-height: 1.4;
+        font-size: 15px;
+        line-height: 1.3;
         color: #555;
         background: white;
-        padding: 12px 16px;
+        padding: 8px 12px;
         border-radius: 10px;
-        margin: 8px 0;
+        margin: 3px 0;  /* 여백 대폭 축소 */
     }
 
     /* 타이머 여백 축소 */
     .timer {
-        font-size: 22px;
+        font-size: 20px;
         font-weight: bold;
         color: #2196f3;
         text-align: center;
-        padding: 8px;
+        padding: 5px;
         background: white;
         border-radius: 8px;
-        margin: 5px 0;
+        margin: 3px 0;  /* 여백 대폭 축소 */
     }
 
     .prompt-text {
@@ -97,7 +97,7 @@ st.markdown("""
         font-size: 18px;
         font-weight: bold;
         text-align: center;
-        margin: 10px 0;
+        margin: 5px 0;  /* 여백 축소 */
         animation: pulse 1s infinite;
     }
     @keyframes pulse {
@@ -126,24 +126,24 @@ st.markdown("""
         display: flex;
         justify-content: center;
         align-items: flex-start;  /* 상단 정렬로 변경 */
-        min-height: 320px;
-        margin: 5px 0;  /* 상하 여백 축소 */
-        padding-top: 10px;  /* 약간의 상단 패딩만 추가 */
+        min-height: 280px;  /* 최소 높이 감소 */
+        margin: 0;  /* 여백 제거 */
+        padding-top: 5px;  /* 최소 패딩만 */
     }
 
     /* Progress bar 여백 조정 */
     .stProgress > div {
-        margin-bottom: 0.5rem !important;
+        margin-bottom: 0.2rem !important;  /* 여백 축소 */
     }
 
     /* 버튼 그룹 간격 조정 */
     .row-widget.stButton {
-        margin-bottom: 0.25rem !important;
+        margin-bottom: 0.15rem !important;  /* 여백 축소 */
     }
 
     /* 전체 요소 간 간격 축소 */
     .element-container {
-        margin-bottom: 0.5rem !important;
+        margin-bottom: 0.3rem !important;  /* 여백 축소 */
     }
 
     /* 라디오 버튼 간격 표준화 - 설문지용 */

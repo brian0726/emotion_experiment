@@ -84,15 +84,14 @@ def survey_mfi_screen():
                 label_visibility="collapsed"
             )
 
-            # 척도 레이블 - 퍼센트 기반 위치 지정
+            # 척도 레이블 - 버튼 5개, 레이블 3개 (양 끝과 중앙)
             st.markdown("""
-                <div style='display: flex; justify-content: space-between; width: 100%; margin-top: -10px;'>
-                    <div style='flex: 0 0 20%; text-align: center; font-size: 11px; color: #666; padding: 0 5px;'>전혀 그렇지 않다</div>
-                    <div style='flex: 0 0 20%; text-align: center; font-size: 11px; color: #666;'></div>
-                    <div style='flex: 0 0 20%; text-align: center; font-size: 11px; color: #666;'>보통이다</div>
-                    <div style='flex: 0 0 20%; text-align: center; font-size: 11px; color: #666;'></div>
-                    <div style='flex: 0 0 20%; text-align: center; font-size: 11px; color: #666; padding: 0 5px;'>매우 그렇다</div>
+                <div style='position: relative; width: 100%; margin-top: -10px;'>
+                    <div style='position: absolute; left: 0; width: 20%; text-align: center; font-size: 11px; color: #666;'>전혀 그렇지 않다</div>
+                    <div style='position: absolute; left: 40%; width: 20%; text-align: center; font-size: 11px; color: #666;'>보통이다</div>
+                    <div style='position: absolute; right: 0; width: 20%; text-align: center; font-size: 11px; color: #666;'>매우 그렇다</div>
                 </div>
+                <div style='height: 15px;'></div>
             """, unsafe_allow_html=True)
 
             st.markdown("<br>", unsafe_allow_html=True)
