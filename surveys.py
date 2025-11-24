@@ -84,12 +84,14 @@ def survey_mfi_screen():
                 label_visibility="collapsed"
             )
 
-            # 척도 레이블 - MFI: 버튼 5개(각 20%), 레이블 3개(각 33.3%)
+            # 척도 레이블 - MFI: 버튼 5개, 레이블은 1,3,5번 위치에
             st.markdown("""
-                <div style='position: relative; width: 100%; height: 20px; margin-top: -10px;'>
-                    <div style='position: absolute; left: 0%; width: 33.3%; text-align: left; padding-left: 10%; font-size: 11px; color: #666;'>전혀 그렇지 않다</div>
-                    <div style='position: absolute; left: 33.3%; width: 33.4%; text-align: center; font-size: 11px; color: #666;'>보통이다</div>
-                    <div style='position: absolute; left: 66.7%; width: 33.3%; text-align: right; padding-right: 10%; font-size: 11px; color: #666;'>매우 그렇다</div>
+                <div style='display: flex; width: 100%; margin-top: -5px;'>
+                    <div style='width: 20%; text-align: center; font-size: 11px; color: #666;'>전혀 그렇지 않다</div>
+                    <div style='width: 20%; text-align: center; font-size: 11px; color: #666;'></div>
+                    <div style='width: 20%; text-align: center; font-size: 11px; color: #666;'>보통이다</div>
+                    <div style='width: 20%; text-align: center; font-size: 11px; color: #666;'></div>
+                    <div style='width: 20%; text-align: center; font-size: 11px; color: #666;'>매우 그렇다</div>
                 </div>
             """, unsafe_allow_html=True)
 
@@ -151,13 +153,13 @@ def survey_phq9_screen():
                 label_visibility="collapsed"
             )
 
-            # 척도 레이블 - PHQ-9: 버튼 4개(각 25%), 레이블 4개(각 25%)
+            # 척도 레이블 - PHQ-9: 버튼 4개, 레이블 4개
             st.markdown("""
-                <div style='position: relative; width: 100%; height: 20px; margin-top: -10px;'>
-                    <div style='position: absolute; left: 0%; width: 25%; text-align: center; font-size: 11px; color: #666;'>전혀 아님</div>
-                    <div style='position: absolute; left: 25%; width: 25%; text-align: center; font-size: 11px; color: #666;'>2~3일 이상</div>
-                    <div style='position: absolute; left: 50%; width: 25%; text-align: center; font-size: 11px; color: #666;'>7일 이상</div>
-                    <div style='position: absolute; left: 75%; width: 25%; text-align: center; font-size: 11px; color: #666;'>거의 매일</div>
+                <div style='display: flex; width: 100%; margin-top: -5px;'>
+                    <div style='width: 25%; text-align: center; font-size: 11px; color: #666;'>전혀 아님</div>
+                    <div style='width: 25%; text-align: center; font-size: 11px; color: #666;'>2~3일 이상</div>
+                    <div style='width: 25%; text-align: center; font-size: 11px; color: #666;'>7일 이상</div>
+                    <div style='width: 25%; text-align: center; font-size: 11px; color: #666;'>거의 매일</div>
                 </div>
             """, unsafe_allow_html=True)
 
