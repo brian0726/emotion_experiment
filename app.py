@@ -125,9 +125,10 @@ st.markdown("""
     .stimulus-container {
         display: flex;
         justify-content: center;
-        align-items: center;
+        align-items: flex-start;  /* 상단 정렬로 변경 */
         min-height: 320px;
-        margin: 10px 0;
+        margin: 5px 0;  /* 상하 여백 축소 */
+        padding-top: 10px;  /* 약간의 상단 패딩만 추가 */
     }
 
     /* Progress bar 여백 조정 */
@@ -145,6 +146,20 @@ st.markdown("""
         margin-bottom: 0.5rem !important;
     }
 
+    /* 라디오 버튼 간격 표준화 - 설문지용 */
+    .stRadio > div[role="radiogroup"] {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .stRadio > div[role="radiogroup"] > label {
+        flex: 1;
+        text-align: center;
+        margin: 0 !important;
+        padding: 0 2px !important;
+    }
+
     /* 캡션 스타일 (디버그용) */
     .stCaption {
         font-size: 10px !important;
@@ -158,8 +173,8 @@ ALL_EMOTIONS = [
     # 기본 정서 (6개)
     "기쁨", "분노", "혐오", "중립", "슬픔", "놀람", "공포",
     # 복합 정서 (16개)
-    "즐거움", "애원하는", "실망하는", "공감하는", "충격받은", "질투하는",
-    "초조한", "안심하는", "우울한", "불안한", "사랑하는", "쌀쌀맞음",
+    "즐거운", "애원하는", "실망하는", "공감하는", "충격받은", "질투하는",
+    "초조한", "안심하는", "우울한", "불안한", "사랑하는", "쌀쌀맞은",
     "활기찬", "쑥스러운", "진지한", "창피한"
 ]
 
@@ -334,7 +349,7 @@ MEDIA_FILES = {
             "1tZMhmdw92XWnjf4c7EJlNkVFUz-iVb8b"
         ]
     },
-    "즐거움": {
+    "즐거운": {
         "image": [
             "112PtmXlqefjBItCkDaumBv2WPiRpG0c3",
             "1R73RTEf52kzeLwpIeHcOWi1sUwdAKeKx",
@@ -598,7 +613,7 @@ MEDIA_FILES = {
             "1StJkHoc_N2phRmEeLgQ9mgvxO3djLD_9"
         ]
     },
-    "쌀쌀맞음": {
+    "쌀쌀맞은": {
         "image": [
             "19gBo_xGykoXp2Jqdcv5BhyL8owgz9naI",
             "1-rt3OKF_Ap1_uY01DeksIrqpMj-ud4ki",
@@ -1153,12 +1168,13 @@ def experiment_screen():
     if not is_practice:
         st.markdown('<div class="instructions">다음 화면을 주의 깊게 관찰하고, 얼굴 표정에 가장 적합한 감정 단어를 선택해 주세요.</div>', unsafe_allow_html=True)
 
-    # 자극과 선택지를 동일한 위치에서 교체하기 위한 단일 컨테이너
-    interaction_placeholder = st.empty()
+    # 자극과 선택지를 위한 placeholder 분리
+    stimulus_placeholder = st.empty()
+    choice_placeholder = st.empty()
 
     # 자극 제시 (5초간)
     if st.session_state.show_stimulus and stimulus_elapsed < 5:
-        with interaction_placeholder.container():
+        with stimulus_placeholder.container():
             # 저장된 자극 파일 가져오기 (더 이상 새로 선택하지 않음)
             file_info = st.session_state.current_stimulus_file
 
@@ -1187,8 +1203,8 @@ def experiment_screen():
                             onerror_chain += f"this.src='{alt_url}';"
 
                     st.markdown(f'''
-                        <div style="text-align: center;">
-                            <img src="{file_url}" style="max-width: 100%; height: auto; max-height: 480px;"
+                        <div style="text-align: center; margin-top: 0;">
+                            <img src="{file_url}" style="max-width: 100%; height: auto; max-height: 400px; display: block; margin: 0 auto;"
                                  onerror="{onerror_chain}">
                         </div>
                     ''', unsafe_allow_html=True)
@@ -1220,11 +1236,14 @@ def experiment_screen():
     # 5초 후 자극 숨기기
     elif st.session_state.show_stimulus and stimulus_elapsed >= 5:
         st.session_state.show_stimulus = False
+        st.session_state.response_start_time = time.time()  # 응답 시작 시간 기록
+        stimulus_placeholder.empty()  # 자극 placeholder 명시적으로 클리어
         st.rerun()
 
     # 선택지 표시 (자극이 사라진 후에만, 동일한 위치에)
     elif not st.session_state.show_stimulus:
-        with interaction_placeholder.container():
+        stimulus_placeholder.empty()  # 자극이 완전히 사라졌는지 확인
+        with choice_placeholder.container():
             # stimulus-container와 동일한 높이 유지를 위한 컨테이너
             st.markdown('<div class="stimulus-container">', unsafe_allow_html=True)
 
@@ -1269,9 +1288,17 @@ def experiment_screen():
 
 # 선택 처리
 def handle_choice(selected_emotion, correct_emotion, is_practice):
-    reaction_time = time.time() - st.session_state.trial_start_time
+    # 반응시간 계산: 선택지가 나타난 이후부터만 계산
+    if hasattr(st.session_state, 'response_start_time'):
+        reaction_time = time.time() - st.session_state.response_start_time
+    else:
+        # fallback: 전체 시간에서 자극 제시 시간(5초)를 뺌
+        total_time = time.time() - st.session_state.trial_start_time
+        reaction_time = max(0, total_time - 5)  # 음수 방지
+
     is_correct = (selected_emotion == correct_emotion) if selected_emotion else False
     response_timestamp = int(time.time() * 1000)  # 현재 시간 (밀리초)
+    is_timeout = selected_emotion is None  # 타임아웃 여부 추가
 
     # 응답 기록
     response_data = {
@@ -1286,7 +1313,8 @@ def handle_choice(selected_emotion, correct_emotion, is_practice):
         'reaction_time_ms': int(reaction_time * 1000),  # 밀리초 단위 반응 시간
         'stimulus_timestamp': st.session_state.stimulus_timestamp,
         'response_timestamp': response_timestamp,
-        'is_practice': is_practice
+        'is_practice': is_practice,
+        'is_timeout': is_timeout  # 타임아웃 여부 추가
     }
 
     st.session_state.responses.append(response_data)
@@ -1439,10 +1467,14 @@ def main_intro_screen():
 
 # 실험 유형 간 30초 휴식 화면
 def rest_between_exp_screen():
-    # 화면 클리어를 위한 컨테이너
-    st.empty()
+    # 모든 이전 UI 요소 제거를 위한 명시적 클리어
+    for _ in range(3):  # 여러 번 클리어하여 확실히 제거
+        st.empty()
 
-    st.title("휴식 시간")
+    # 새로운 컨테이너 생성
+    container = st.container()
+    with container:
+        st.title("휴식 시간")
 
     exp_type = st.session_state.experiment_type
 
@@ -1464,10 +1496,14 @@ def rest_between_exp_screen():
     st.session_state.stage = 'next_part'
     st.rerun()
 def rest_screen():
-    # 화면 클리어를 위한 컨테이너
-    st.empty()
+    # 모든 이전 UI 요소 제거를 위한 명시적 클리어
+    for _ in range(3):  # 여러 번 클리어하여 확실히 제거
+        st.empty()
 
-    st.title("휴식 시간")
+    # 새로운 컨테이너 생성
+    container = st.container()
+    with container:
+        st.title("휴식 시간")
 
     st.markdown('<div class="instructions">휴식 시간입니다. 30초간 휴식 후 다시 과제가 시작될 예정입니다.</div>', unsafe_allow_html=True)
 

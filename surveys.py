@@ -74,23 +74,26 @@ def survey_mfi_screen():
             </div>
             """, unsafe_allow_html=True)
 
-            responses[f"mfi_q{i}"] = st.radio(
+            responses[f"MFI_Q{i}"] = st.radio(
                 f"문항 {i}",
                 options=[1, 2, 3, 4, 5],
                 index=None,
                 format_func=lambda x: f"{x}",
                 horizontal=True,
-                key=f"mfi_q{i}",
+                key=f"MFI_Q{i}",
                 label_visibility="collapsed"
             )
 
-            # 척도 레이블 - 컬럼 사용하여 안정적으로 배치
-            label_cols = st.columns(5)
-            label_cols[0].markdown("<div style='text-align: center; font-size: 11px; color: #666;'>전혀 그렇지 않다</div>", unsafe_allow_html=True)
-            label_cols[1].markdown("<div style='text-align: center; font-size: 11px; color: #666;'></div>", unsafe_allow_html=True)
-            label_cols[2].markdown("<div style='text-align: center; font-size: 11px; color: #666;'>보통이다</div>", unsafe_allow_html=True)
-            label_cols[3].markdown("<div style='text-align: center; font-size: 11px; color: #666;'></div>", unsafe_allow_html=True)
-            label_cols[4].markdown("<div style='text-align: center; font-size: 11px; color: #666;'>매우 그렇다</div>", unsafe_allow_html=True)
+            # 척도 레이블 - 퍼센트 기반 위치 지정
+            st.markdown("""
+                <div style='display: flex; justify-content: space-between; width: 100%; margin-top: -10px;'>
+                    <div style='flex: 0 0 20%; text-align: center; font-size: 11px; color: #666; padding: 0 5px;'>전혀 그렇지 않다</div>
+                    <div style='flex: 0 0 20%; text-align: center; font-size: 11px; color: #666;'></div>
+                    <div style='flex: 0 0 20%; text-align: center; font-size: 11px; color: #666;'>보통이다</div>
+                    <div style='flex: 0 0 20%; text-align: center; font-size: 11px; color: #666;'></div>
+                    <div style='flex: 0 0 20%; text-align: center; font-size: 11px; color: #666; padding: 0 5px;'>매우 그렇다</div>
+                </div>
+            """, unsafe_allow_html=True)
 
             st.markdown("<br>", unsafe_allow_html=True)
 
@@ -140,22 +143,25 @@ def survey_phq9_screen():
             </div>
             """, unsafe_allow_html=True)
 
-            responses[f"phq9_q{i}"] = st.radio(
+            responses[f"PHQ9_Q{i}"] = st.radio(
                 f"문항 {i}",
                 options=[0, 1, 2, 3],
                 index=None,
                 format_func=lambda x: f"{x}",
                 horizontal=True,
-                key=f"phq9_q{i}",
+                key=f"PHQ9_Q{i}",
                 label_visibility="collapsed"
             )
 
-            # 척도 레이블 - 컬럼 사용하여 안정적으로 배치
-            label_cols = st.columns(4)
-            label_cols[0].markdown("<div style='text-align: center; font-size: 11px; color: #666;'>전혀 아님</div>", unsafe_allow_html=True)
-            label_cols[1].markdown("<div style='text-align: center; font-size: 11px; color: #666;'>2~3일 이상</div>", unsafe_allow_html=True)
-            label_cols[2].markdown("<div style='text-align: center; font-size: 11px; color: #666;'>7일 이상</div>", unsafe_allow_html=True)
-            label_cols[3].markdown("<div style='text-align: center; font-size: 11px; color: #666;'>거의 매일</div>", unsafe_allow_html=True)
+            # 척도 레이블 - 퍼센트 기반 위치 지정
+            st.markdown("""
+                <div style='display: flex; justify-content: space-between; width: 100%; margin-top: -10px;'>
+                    <div style='flex: 0 0 25%; text-align: center; font-size: 11px; color: #666; padding: 0 5px;'>전혀 아님</div>
+                    <div style='flex: 0 0 25%; text-align: center; font-size: 11px; color: #666;'>2~3일 이상</div>
+                    <div style='flex: 0 0 25%; text-align: center; font-size: 11px; color: #666;'>7일 이상</div>
+                    <div style='flex: 0 0 25%; text-align: center; font-size: 11px; color: #666; padding: 0 5px;'>거의 매일</div>
+                </div>
+            """, unsafe_allow_html=True)
 
             st.markdown("<br>", unsafe_allow_html=True)
 
@@ -228,11 +234,11 @@ def survey_tipi_screen():
             </div>
             """, unsafe_allow_html=True)
 
-            responses[f"tipi_q{i}"] = st.selectbox(
+            responses[f"TIPI_Q{i}"] = st.selectbox(
                 f"문항 {i}",
                 options=[None, 1, 2, 3, 4, 5, 6, 7],
                 format_func=lambda x: "선택하세요" if x is None else f"{x} - {scale_labels[x]}",
-                key=f"tipi_q{i}",
+                key=f"TIPI_Q{i}",
                 label_visibility="collapsed"
             )
 
