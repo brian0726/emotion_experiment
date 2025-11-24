@@ -65,6 +65,24 @@ def survey_mfi_screen():
     """, unsafe_allow_html=True)
 
     with st.form("mfi_form"):
+        # 라디오 버튼 간격 조정 CSS - 5개 버튼을 균등하게 배치
+        st.markdown("""
+        <style>
+        /* MFI 라디오 버튼 간격 */
+        [data-testid="stRadio"] > div[role="radiogroup"] {
+            display: flex !important;
+            justify-content: space-between !important;
+            width: 100% !important;
+        }
+        [data-testid="stRadio"] > div[role="radiogroup"] > label {
+            flex: 1 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            text-align: center !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
         responses = {}
 
         for i, question in enumerate(MFI_QUESTIONS, 1):
@@ -131,6 +149,24 @@ def survey_phq9_screen():
     """, unsafe_allow_html=True)
 
     with st.form("phq9_form"):
+        # 라디오 버튼 간격 조정 CSS - 4개 버튼을 균등하게 배치
+        st.markdown("""
+        <style>
+        /* PHQ-9 라디오 버튼 간격 */
+        [data-testid="stRadio"] > div[role="radiogroup"] {
+            display: flex !important;
+            justify-content: space-between !important;
+            width: 100% !important;
+        }
+        [data-testid="stRadio"] > div[role="radiogroup"] > label {
+            flex: 1 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            text-align: center !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
         responses = {}
 
         for i, question in enumerate(PHQ9_QUESTIONS, 1):
