@@ -84,14 +84,26 @@ def survey_mfi_screen():
                 label_visibility="collapsed"
             )
 
-            # 척도 레이블 - MFI: 버튼 5개, 레이블은 1,3,5번 위치에
+            # 척도 레이블 - MFI: 실제 버튼 위치에 맞춤 조정
+            # Streamlit 라디오 버튼은 약간의 좌측 패딩이 있음
             st.markdown("""
-                <div style='display: flex; width: 100%; margin-top: -5px;'>
-                    <div style='width: 20%; text-align: center; font-size: 11px; color: #666;'>전혀 그렇지 않다</div>
-                    <div style='width: 20%; text-align: center; font-size: 11px; color: #666;'></div>
-                    <div style='width: 20%; text-align: center; font-size: 11px; color: #666;'>보통이다</div>
-                    <div style='width: 20%; text-align: center; font-size: 11px; color: #666;'></div>
-                    <div style='width: 20%; text-align: center; font-size: 11px; color: #666;'>매우 그렇다</div>
+                <style>
+                    .mfi-labels {
+                        display: flex;
+                        width: calc(100% - 1rem);
+                        margin-left: 0.5rem;
+                        margin-top: -8px;
+                    }
+                    .mfi-labels > div {
+                        flex: 1;
+                        font-size: 11px;
+                        color: #666;
+                    }
+                </style>
+                <div class='mfi-labels'>
+                    <div style='text-align: left;'>전혀 그렇지 않다</div>
+                    <div style='text-align: center; margin-left: -40px;'>보통이다</div>
+                    <div style='text-align: right;'>매우 그렇다</div>
                 </div>
             """, unsafe_allow_html=True)
 
@@ -153,13 +165,27 @@ def survey_phq9_screen():
                 label_visibility="collapsed"
             )
 
-            # 척도 레이블 - PHQ-9: 버튼 4개, 레이블 4개
+            # 척도 레이블 - PHQ-9: 실제 버튼 위치에 맞춤 조정
             st.markdown("""
-                <div style='display: flex; width: 100%; margin-top: -5px;'>
-                    <div style='width: 25%; text-align: center; font-size: 11px; color: #666;'>전혀 아님</div>
-                    <div style='width: 25%; text-align: center; font-size: 11px; color: #666;'>2~3일 이상</div>
-                    <div style='width: 25%; text-align: center; font-size: 11px; color: #666;'>7일 이상</div>
-                    <div style='width: 25%; text-align: center; font-size: 11px; color: #666;'>거의 매일</div>
+                <style>
+                    .phq-labels {
+                        display: flex;
+                        width: calc(100% - 1rem);
+                        margin-left: 0.5rem;
+                        margin-top: -8px;
+                    }
+                    .phq-labels > div {
+                        width: 25%;
+                        text-align: center;
+                        font-size: 11px;
+                        color: #666;
+                    }
+                </style>
+                <div class='phq-labels'>
+                    <div>전혀 아님</div>
+                    <div>2~3일 이상</div>
+                    <div>7일 이상</div>
+                    <div>거의 매일</div>
                 </div>
             """, unsafe_allow_html=True)
 
