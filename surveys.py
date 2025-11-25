@@ -68,23 +68,28 @@ def survey_mfi_screen():
         # 라디오 버튼 간격 조정 CSS - 5개 버튼을 균등하게 배치
         st.markdown("""
         <style>
-        /* MFI 라디오 버튼 강제 균등 배치 */
-        div[data-testid="stRadio"] > div[role="radiogroup"] {
+        /* MFI 라디오 버튼 강제 균등 배치 - 더 구체적인 selector */
+        .stRadio > div {
             display: grid !important;
             grid-template-columns: repeat(5, 1fr) !important;
             width: 100% !important;
             gap: 0 !important;
         }
-        div[data-testid="stRadio"] > div[role="radiogroup"] > label {
+        .stRadio > div > label {
             display: flex !important;
             justify-content: center !important;
             align-items: center !important;
             margin: 0 !important;
-            padding: 0 !important;
+            padding: 0 5px !important;
             width: 100% !important;
         }
-        div[data-testid="stRadio"] > div[role="radiogroup"] > label > div:first-child {
+        .stRadio > div > label > div {
             margin: 0 auto !important;
+        }
+        /* 라디오 버튼 텍스트 숨기기 (숫자만 표시) */
+        .stRadio > div > label > div:last-child {
+            display: flex !important;
+            justify-content: center !important;
         }
         </style>
         """, unsafe_allow_html=True)
@@ -158,23 +163,28 @@ def survey_phq9_screen():
         # 라디오 버튼 간격 조정 CSS - 4개 버튼을 균등하게 배치
         st.markdown("""
         <style>
-        /* PHQ-9 라디오 버튼 강제 균등 배치 */
-        div[data-testid="stRadio"] > div[role="radiogroup"] {
+        /* PHQ-9 라디오 버튼 강제 균등 배치 - 더 구체적인 selector */
+        .stRadio > div {
             display: grid !important;
             grid-template-columns: repeat(4, 1fr) !important;
             width: 100% !important;
             gap: 0 !important;
         }
-        div[data-testid="stRadio"] > div[role="radiogroup"] > label {
+        .stRadio > div > label {
             display: flex !important;
             justify-content: center !important;
             align-items: center !important;
             margin: 0 !important;
-            padding: 0 !important;
+            padding: 0 5px !important;
             width: 100% !important;
         }
-        div[data-testid="stRadio"] > div[role="radiogroup"] > label > div:first-child {
+        .stRadio > div > label > div {
             margin: 0 auto !important;
+        }
+        /* 라디오 버튼 텍스트 숨기기 (숫자만 표시) */
+        .stRadio > div > label > div:last-child {
+            display: flex !important;
+            justify-content: center !important;
         }
         </style>
         """, unsafe_allow_html=True)
