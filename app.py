@@ -132,10 +132,9 @@ st.markdown("""
     .stimulus-container {
         display: flex;
         justify-content: center;
-        align-items: flex-start;  /* 상단 정렬로 변경 */
-        min-height: 280px;  /* 최소 높이 감소 */
-        margin: 0;  /* 여백 제거 */
-        padding-top: 5px;  /* 최소 패딩만 */
+        align-items: center;  /* 중앙 정렬 */
+        min-height: 300px;  /* 화면 중앙쪽으로 */
+        margin: 10px 0;
     }
 
     /* Progress bar 여백 조정 */
@@ -151,6 +150,16 @@ st.markdown("""
     /* 전체 요소 간 간격 축소 */
     .element-container {
         margin-bottom: 0.3rem !important;  /* 여백 축소 */
+    }
+
+    /* 설문 라디오 버튼 간격 조정 */
+    .stRadio > div {
+        flex-direction: row;
+        gap: 12px;  /* 버튼 간 간격 */
+    }
+    .stRadio label {
+        padding-right: 8px;
+        font-size: 14px;
     }
 
     /* 라디오 버튼 간격 표준화 - 설문지용 */
@@ -772,6 +781,8 @@ def init_session_state():
         st.session_state.show_stimulus = True
     if 'stimulus_shown_time' not in st.session_state:
         st.session_state.stimulus_shown_time = None
+    if 'response_start_time' not in st.session_state:
+        st.session_state.response_start_time = None
     if 'current_stimulus_file' not in st.session_state:
         st.session_state.current_stimulus_file = None
     if 'current_stimulus_id' not in st.session_state:
@@ -1280,12 +1291,19 @@ def experiment_screen():
 
             st.markdown('</div>', unsafe_allow_html=True)
 
-    # 10초 후 "빠르게 응답해 주세요" 프롬프트 표시 (자극 5초 + 응답 5초 경과 시)
-    if not st.session_state.show_stimulus and elapsed >= 10:
+    # response_elapsed 계산
+    response_elapsed = 0
+    if st.session_state.get('response_start_time'):
+        response_elapsed = int(time.time() - st.session_state.response_start_time)
+
+    # 반응 시작 후 5초에 "빠르게 응답해 주세요" 표시
+    if (not st.session_state.show_stimulus
+        and st.session_state.response_start_time
+        and response_elapsed >= 5):
         st.markdown('<div class="prompt-text">⚡ 빠르게 응답해 주세요</div>', unsafe_allow_html=True)
 
-    # 15초 후 자동 넘어가기 (자극 5초 + 응답 10초)
-    if elapsed >= 15:
+    # 반응 시작 기준 10초 후 자동 넘어가기
+    if st.session_state.response_start_time and response_elapsed >= 10:
         handle_choice(None, emotion, is_practice)
         return
 
@@ -1295,13 +1313,15 @@ def experiment_screen():
 
 # 선택 처리
 def handle_choice(selected_emotion, correct_emotion, is_practice):
-    # 반응시간 계산: 선택지가 나타난 이후부터만 계산
-    if hasattr(st.session_state, 'response_start_time'):
+    # 반응시간 계산: response_start_time 기준, 최대 10초
+    if st.session_state.get('response_start_time'):
         reaction_time = time.time() - st.session_state.response_start_time
     else:
         # fallback: 전체 시간에서 자극 제시 시간(5초)를 뺌
-        total_time = time.time() - st.session_state.trial_start_time
-        reaction_time = max(0, total_time - 5)  # 음수 방지
+        reaction_time = max(0.0, (time.time() - st.session_state.trial_start_time) - 5.0)
+
+    # 10초 이상은 10초로 제한
+    reaction_time = min(reaction_time, 10.0)
 
     is_correct = (selected_emotion == correct_emotion) if selected_emotion else False
     response_timestamp = int(time.time() * 1000)  # 현재 시간 (밀리초)
@@ -1399,6 +1419,7 @@ def next_trial():
     st.session_state.stimulus_shown_time = time.time()
     st.session_state.show_stimulus = True
     st.session_state.show_prompt = False
+    st.session_state.response_start_time = None  # 반응 시간 초기화
     st.rerun()
 
 # 5. 연습 반복 확인 화면
