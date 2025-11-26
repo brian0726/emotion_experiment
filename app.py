@@ -59,6 +59,13 @@ st.markdown("""
         background-color: #1976d2;
         transform: translateY(-2px);
     }
+    /* 버튼 포커스/클릭 잔상 제거 */
+    .stButton>button:focus,
+    .stButton>button:active {
+        outline: none !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
     .choice-button {
         padding: 15px 10px;
         margin: 5px;
