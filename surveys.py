@@ -55,7 +55,7 @@ TIPI_QUESTIONS = [
 
 # 1. MFI 피로도 설문 화면
 def survey_mfi_screen():
-    st.title("😴 피로도 설문 (MFI)")
+    st.title("피로도 설문 (MFI)")
 
     st.markdown("""
     <div class="instructions">
@@ -150,7 +150,7 @@ def survey_mfi_screen():
 
 # 2. PHQ-9 우울 설문 화면
 def survey_phq9_screen():
-    st.title("💙 우울 설문 (PHQ-9)")
+    st.title("우울 설문 (PHQ-9)")
 
     st.markdown("""
     <div class="instructions">
@@ -248,7 +248,7 @@ def survey_phq9_screen():
 
 # 3. TIPI 성격 설문 화면
 def survey_tipi_screen():
-    st.title("🎭 성격 설문 (TIPI)")
+    st.title("성격 설문 (TIPI)")
 
     st.markdown("""
     <div class="instructions">

@@ -13,7 +13,7 @@ from surveys import survey_mfi_screen, survey_phq9_screen, survey_tipi_screen
 # 페이지 설정
 st.set_page_config(
     page_title="감정 인식 실험",
-    page_icon="🎭",
+    page_icon="📊",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
@@ -1286,7 +1286,7 @@ def experiment_screen():
             # 스킵 버튼 (특정 학번만, 본 실험에서만)
             if st.session_state.skip_enabled and not is_practice:
                 st.markdown("---")
-                if st.button("⏭️ 스킵", use_container_width=True):
+                if st.button("스킵", use_container_width=True):
                     handle_skip(emotion)
 
             st.markdown('</div>', unsafe_allow_html=True)
@@ -1300,7 +1300,7 @@ def experiment_screen():
     if (not st.session_state.show_stimulus
         and st.session_state.response_start_time
         and response_elapsed >= 5):
-        st.markdown('<div class="prompt-text">⚡ 빠르게 응답해 주세요</div>', unsafe_allow_html=True)
+        st.markdown('<div class="prompt-text">빠르게 응답해 주세요</div>', unsafe_allow_html=True)
 
     # 반응 시작 기준 10초 후 자동 넘어가기
     if st.session_state.response_start_time and response_elapsed >= 10:
@@ -1592,7 +1592,7 @@ def completion_screen():
     # 데이터를 엑셀 양식에 맞게 변환
     try:
         final_df = prepare_final_dataframe()
-        st.success("✅ 데이터 변환 완료")
+        st.success("데이터 변환 완료")
 
         # Google Sheets에 자동 저장 시도
         if 'gcp_service_account' in st.secrets:
@@ -1600,12 +1600,12 @@ def completion_screen():
                 success, error_msg = upload_to_gsheet(final_df)
 
             if success:
-                st.success("✅ Google Sheets에 자동 저장 완료!")
+                st.success("Google Sheets에 자동 저장 완료")
             else:
-                st.error(f"⚠️ Google Sheets 저장 실패: {error_msg}")
+                st.error(f"Google Sheets 저장 실패: {error_msg}")
                 st.info("아래에서 수동으로 다운로드할 수 있습니다.")
         else:
-            st.warning("⚠️ Google Sheets 연동 설정이 없어 수동 다운로드만 가능합니다.")
+            st.warning("Google Sheets 연동 설정이 없어 수동 다운로드만 가능합니다.")
 
         st.markdown("---")
 
