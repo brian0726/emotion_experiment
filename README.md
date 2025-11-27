@@ -95,11 +95,13 @@ streamlit run app.py
 
 ```
 emotion_experiment/
-├── app.py                    # 메인 실험 앱
-├── surveys.py                # 설문조사 모듈
-├── requirements.txt          # 패키지 의존성
-├── .gitignore               # Git 제외 파일
-└── README.md                # 프로젝트 설명
+├── app.py                              # 메인 실험 앱
+├── surveys.py                          # 설문조사 모듈
+├── requirements.txt                    # 패키지 의존성
+├── media_files_with_file_ids.json     # Google Drive 파일 ID 매핑
+├── DEPLOY.md                           # 배포 가이드
+├── .gitignore                          # Git 제외 파일
+└── README.md                           # 프로젝트 설명
 ```
 
 
