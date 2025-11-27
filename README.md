@@ -50,27 +50,14 @@
 
 ### 설문조사 (4종)
 
-#### 1. 일반 설문
-- 감정 인식 능력 자가 평가
-- 실험 난이도 평가
-- 자유 의견
-
-#### 2. 피로도 설문 (MFI - Multidimensional Fatigue Inventory)
+#### 1. 피로도 설문 (MFI - Multidimensional Fatigue Inventory)
 - 12문항
-- 5점 척도 (1: 전혀 그렇지 않다 ~ 5: 매우 그렇다)
-- 신체적/정신적 피로도 측정
 
-#### 3. 우울 설문 (PHQ-9 - Patient Health Questionnaire)
+#### 2. 우울 설문 (PHQ-9 - Patient Health Questionnaire)
 - 9문항
-- 4점 척도 (0: 전혀 아님 ~ 3: 거의 매일)
-- 우울 심각도 자동 계산 및 피드백
-- 위기 상담 안내 포함
 
 #### 4. 성격 설문 (TIPI - Ten-Item Personality Inventory)
 - 10문항
-- 7점 척도 (1: 전혀 동의하지 않는다 ~ 7: 매우 동의한다)
-- Big Five 성격 특성 측정 및 시각화
-  - 외향성, 우호성, 성실성, 정서적 안정성, 개방성
 
 ## 설치 및 실행
 
@@ -109,36 +96,11 @@ streamlit run app.py
 emotion_experiment/
 ├── app.py                    # 메인 실험 앱
 ├── surveys.py                # 설문조사 모듈
-├── data/                     # 데이터 저장 디렉토리 (자동 생성)
 ├── requirements.txt          # 패키지 의존성
 ├── .gitignore               # Git 제외 파일
 └── README.md                # 프로젝트 설명
 ```
 
-## 데이터 저장
-
-실험 결과는 `data/` 디렉토리에 CSV 형식으로 저장됩니다.
-
-### 파일 구조
-```
-data/
-├── response_학번_날짜_시간.csv      # 실험 응답 데이터
-├── survey_이름_날짜_시간.csv        # 일반 설문 데이터
-├── mfi_학번_날짜_시간.csv           # 피로도 설문 데이터
-├── phq9_학번_날짜_시간.csv          # 우울 설문 데이터
-└── tipi_학번_날짜_시간.csv          # 성격 설문 데이터
-```
-
-### 응답 데이터 컬럼
-- `trial_number`: 문항 번호 (1-23)
-- `experiment_type`: 실험 타입 (1: 이미지, 2: 동영상, 3: 맥락)
-- `correct_emotion`: 정답 감정
-- `selected_emotion`: 선택한 감정
-- `is_correct`: 정답 여부 (True/False)
-- `reaction_time`: 반응 시간 (초)
-- `is_practice`: 연습 시행 여부
-- `name`, `gender`, `birthdate`, `drc_code`, `student_id`: 참가자 정보
-- `timestamp`: 기록 시각
 
 ## 미디어 파일 설정
 
@@ -148,63 +110,17 @@ data/
 - **동영상**: 각 감정당 3개씩
 - **맥락**: 각 감정당 3개씩
 
-### 설정 방법
-1. Google Drive에 미디어 파일 업로드
-2. 공유 설정: "링크가 있는 모든 사용자"
-3. `app.py`의 `MEDIA_FILES` 딕셔너리에 파일 ID 추가
 
-```python
-MEDIA_FILES = {
-    "기쁨": {
-        "image": ["FILE_ID_1", "FILE_ID_2", ...],  # 10개
-        "video": ["FILE_ID_1", "FILE_ID_2", ...],  # 3개
-        "context": ["FILE_ID_1", "FILE_ID_2", ...] # 3개
-    },
-    # ... 다른 감정들
-}
-```
 
-## 특수 기능
 
-### 스킵 기능
-특정 학번(2023321063)으로 로그인 시 본 실험에서 문항 스킵 기능 활성화
 
 ### 자동 타이머
 - 자극 제시: 5초 후 자동으로 사라짐
 - 프롬프트: 5초 후 "빠르게 응답해 주세요" 표시
 - 자동 진행: 10초 후 다음 문항으로 자동 이동
 
-## 실험 결과 분석
 
-각 설문은 다음과 같은 분석 결과를 제공합니다:
 
-### PHQ-9 우울 설문
-- 총점 계산 (0-27점)
-- 심각도 평가 (최소/경미/중간/중증도/심각)
-- 위기 상황 감지 및 상담 안내
-
-### TIPI 성격 설문
-- Big Five 차원별 점수 계산
-- 시각적 프로필 제공
-- 각 특성별 설명 제공
-
-## 주의사항
-
-1. **Google Drive 파일 설정**: 모든 미디어 파일의 공유 설정을 "링크가 있는 모든 사용자"로 설정해야 합니다.
-
-2. **개인정보 보호**: `data/` 디렉토리는 `.gitignore`에 포함되어 GitHub에 업로드되지 않습니다.
-
-3. **타이머 정확도**: Streamlit의 제한으로 인해 타이머가 정확히 5초/10초가 아닐 수 있습니다. 중요한 연구에서는 추가 검증이 필요합니다.
-
-4. **윤리적 고려사항**: PHQ-9 설문에서 자해/자살 생각이 감지되면 즉시 전문가 상담 정보를 제공합니다.
-
-## 기술 스택
-
-- **프레임워크**: Streamlit 1.29.0
-- **데이터 처리**: Pandas 2.1.3
-- **언어**: Python 3.8+
-- **데이터 저장**: CSV
-- **배포**: Streamlit Cloud / GitHub
 
 ## 라이선스
 
